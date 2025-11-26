@@ -2,41 +2,96 @@
     ViewData["Title"] = "Home Page";
 }
 
+<style>
+    .main-card {
+        max-width: 1000px; 
+        margin: 40px auto;
+        padding: 50px;
+        background-color: #ffffff;
+        border-radius: 15px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        border-top: 5px solid #FF8C00;
+    }
+
+    .main-title {
+        color: #FF8C00;
+        font-weight: 700;
+        letter-spacing: 2px;
+        margin-bottom: 30px;
+        font-size: 36px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .btn-btec-primary {
+        background-color: #FF8C00;
+        color: white;
+        border: none;
+        padding: 10px 25px;
+        font-size: 16px;
+        font-weight: bold;
+        border-radius: 5px;
+        text-decoration: none;
+        display: inline-block;
+        margin: 5px;
+        transition: background-color 0.3s, box-shadow 0.3s;
+        box-shadow: 0 4px #e07b00;
+    }
+
+        .btn-btec-primary:hover {
+            background-color: #FFB347;
+            box-shadow: 0 2px #e07b00;
+            transform: translateY(2px);
+        }
+
+    .db-status-connected {
+        color: #4F9C4F;
+        font-weight: bold;
+        margin-top: 20px;
+    }
+
+    .db-status-failed {
+        color: #E74C3C;
+        font-weight: bold;
+        margin-top: 20px;
+    }
+</style>
+
 <div class="text-center">
-    <img src="~/Figure/Btec.png" alt="BTEC" style="width: 150px; margin-top: 10px; margin-bottom: 30px;">
+    <img src="~/Figure/Btec.png" alt="BTEC" style="width: 200px; margin-top: 10px;">
 
+    <div class="main-card">
 
-    @if(ViewBag.Username == null)
-    {
-        <h1 class="display-4">Student Information Management System </h1>
-        <p>
-            Neu khong co tai khoan, xin vui long
-            <a href="@Url.Action("Index", "Register")"> dang ky</a>.
-        </p>
-        <p>
-            Neu da co tai khoan, xin vui long
-            <a href="@Url.Action("Index", "Login")"> dang nhap</a>.
-        </p>
-    }
-    else
-    {
-        <h1>
-            Welcome @ViewBag.Username
-        </h1>
-        <a href="@Url.Action("Index", "Task")"> Xem nhiem vu</a>
-    }
+        @if (ViewBag.Username == null)
+        {
+            <h1 class="main-title">Student Information Management System </h1>
 
-    @if (@ViewBag.isConnected)
-    {
-        <h1>
-            Connected database
-        </h1>
-    }
-    else
-    {
-        <h1>
-            Couldnt connect to database
-        </h1>
-    }
+            <div style="margin-top: 30px;">
+                <a href="@Url.Action("Index", "Register")" class="btn-btec-primary"> Register Now </a>
+                <a href="@Url.Action("Index", "Login")" class="btn-btec-primary"> Login </a>
+            </div>
+        }
+        else
+        {
+            <h1 class="main-title">
+                Welcome @ViewBag.Username
+            </h1>
+            <a href="@Url.Action("Index", "Task")" class="btn-btec-primary"> Xem nhiệm vụ</a>
+        }
+
+        @if (@ViewBag.isConnected)
+        {
+            <h1 class="db-status-connected">
+                Connected database
+            </h1>
+        }
+        else
+        {
+            <h1 class="db-status-failed">
+                Couldn't connect to database
+            </h1>
+        }
+    </div>
 
 </div>
