@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Threading.Tasks;
 
 namespace AuthApp.Controllers
 {
@@ -19,33 +20,29 @@ namespace AuthApp.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            string username = HttpContext.Session.GetString("Username");
-            if (username != null)
+            if (User.Identity.IsAuthenticated)
             {
                 return RedirectToAction("Index", "Home");
             }
-            else
-            {
-                return View();
-            }
+            return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> Login(string username, string password, string role)
         {
+            ViewBag.Username = username;
+
             var account = await _context.Accounts.FirstOrDefaultAsync(u => u.Username == username && u.Password == password);
 
             if (account == null)
             {
-                ViewBag.Username = username;
-                ViewBag.ErrorMessage = "Wrong username or password.";
+                ViewBag.ErrorMessage = "<strong>Incorrect Username or Password.</strong> Please check your Username and Password.";
                 return View("Index");
             }
 
             if (account.Role != role)
             {
-                ViewBag.Username = username;
-                ViewBag.ErrorMessage = "The selected role does not match your account type. Please select the correct role.";
+                ViewBag.ErrorMessage = "<strong>Incorrect Role.</strong> The selected role does not match your account type. Please select the correct role.";
                 return View("Index");
             }
 
