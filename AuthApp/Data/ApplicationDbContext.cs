@@ -17,12 +17,16 @@ namespace AuthApp.Data
         {
             modelBuilder.Entity<Account>(e =>
             {
-                e.ToTable("accounts");
+                e.ToTable("Account");
                 e.HasKey(x => x.Id);
-                e.Property(x => x.Id).HasColumnName("id");
-                e.Property(x => x.Username).HasColumnName("username").HasMaxLength(255).IsRequired();
-                e.Property(x => x.Fullname).HasColumnName("fullname").HasMaxLength(255).IsRequired();
-                e.Property(x => x.Password).HasColumnName("password").HasMaxLength(255).IsRequired();
+                e.Property(x => x.Id).HasColumnName("Id");
+                e.Property(x => x.Username).HasColumnName("Username").HasMaxLength(50).IsRequired();
+                e.Property(x => x.Fullname).HasColumnName("Fullname").HasMaxLength(100).IsRequired();
+                e.Property(x => x.Password).HasColumnName("PasswordHash").HasMaxLength(255).IsRequired();
+                e.Property(x => x.Email).HasColumnName("Email").HasMaxLength(100).IsRequired();
+                e.Property(x => x.PhoneNumber).HasColumnName("PhoneNumber").HasMaxLength(20); 
+                e.Property(x => x.Role).HasColumnName("Role").HasMaxLength(20).IsRequired();
+                e.Property(x => x.CreatedAt).HasColumnName("CreatedAt").ValueGeneratedOnAdd(); 
             });
 
             modelBuilder.Entity<Category>(e =>

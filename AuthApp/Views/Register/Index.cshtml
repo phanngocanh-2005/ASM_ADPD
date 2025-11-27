@@ -1,37 +1,198 @@
-﻿
-@model Account
+﻿@model Account
 
+<style>
+    :root {
+        --btec-orange: #FF6600;
+        --btec-dark-orange: #e65500;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(15px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* FORM STYLE */
+    .title-orange {
+        color: var(--btec-orange);
+        font-weight: bold;
+        font-size: 16px;
+    }
+
+    .orange-border {
+        border: 2px solid var(--btec-orange) !important;
+        border-radius: 10px;
+        padding: 10px;
+        font-size: 16px;
+        transition: 0.3s ease, box-shadow 0.3s ease;
+        box-sizing: border-box;
+    }
+
+        .orange-border:focus {
+            border-color: var(--btec-dark-orange);
+            box-shadow: 0 0 8px rgba(255,102,0,0.4);
+            outline: none;
+        }
+
+    /* CONTAINER */
+    .right-bg {
+        background-image: url('/Figure/General_photo.jpg');
+        background-size: cover;
+        background-position: center;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 40px;
+        overflow: hidden;
+    }
+
+    .form-container {
+        border: 2px solid var(--btec-orange);
+        border-radius: 12px;
+        padding: 30px;
+        background: rgba(255,255,255,0.95);
+        max-width: 450px;
+        width: 100%;
+        animation: fadeIn 1s ease forwards;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        display: flex;
+        flex-direction: column;
+        gap: 15px; /* khoảng cách đều giữa input */
+    }
+
+        .form-container:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.2);
+        }
+
+    /* BUTTON */
+    .btn-register {
+        border: 2px solid var(--btec-orange);
+        color: var(--btec-orange);
+        font-weight: 700;
+        padding: 12px;
+        font-size: 18px;
+        transition: 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .btn-register:hover {
+            background-color: var(--btec-orange);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 0 12px rgba(255,102,0,0.5);
+        }
+
+    /* RIGHT TEXT */
+    .right-text {
+        color: var(--btec-orange);
+        font-weight: 700;
+        font-size: 22px;
+        text-align: center;
+        animation: slideUp 1s ease forwards;
+        text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+        max-width: 300px;
+    }
+
+    @@media screen and (max-width: 768px) {
+        .form-container {
+            max-width: 90%;
+        }
+
+        .right-text {
+            font-size: 20px;
+        }
+    }
+</style>
 
 <div class="container-fluid">
+    <div class="row" style="min-height:100vh;">
 
-    <div class="row">
-        <div class="col-sm-12 col-md-12 col-xl-12 text-center">
-            <h1>
-                Register
-            </h1>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-4 col-md-4 col-xl-4 align-self-center">
-            
-            <form asp-action="RegisterAccount" method="post">
-                <div class="mb-3">
-                   <label asp-for="Username">Username</label>
-                    <input type="text" name="username" asp-for="Username" class="form-control w-100" />
-                </div>
-                <div class="mb-3">
-                    <label asp-for="Fullname">Fullname</label>
-                    <input type="text" name="fullname" asp-for="Fullname" class="form-control w-100" />
-                </div>
-                <div class="mb-3">
-                    <label asp-for="Password">Password</label>
-                    <input type="password" name="password" asp-for="Password" class="form-control w-100" />
-                </div>
-                <button type="submit" class="btn btn-outline-success w-100">
-                    Register
-                </button>
-            </form>
+        <!-- LEFT: FORM -->
+        <div class="col-sm-6 d-flex align-items-center justify-content-center p-5">
+            <div class="form-container">
 
+                <div class="text-center mb-3">
+                    <img src="/Figure/Btec.png" width="140" />
+                </div>
+
+                <h1 class="title-orange text-center mb-4">Register</h1>
+
+                <form asp-action="RegisterAccount" method="post">
+                    <div class="d-flex flex-column gap-3">
+                        <div>
+                            <label asp-for="Username" class="title-orange">Username</label>
+                            <input type="text" asp-for="Username" class="form-control orange-border w-100" />
+                            <span asp-validation-for="Username" class="text-danger"></span>
+                        </div>
+
+                        <div>
+                            <label asp-for="Fullname" class="title-orange">Fullname</label>
+                            <input type="text" asp-for="Fullname" class="form-control orange-border w-100" />
+                            <span asp-validation-for="Fullname" class="text-danger"></span>
+                        </div>
+
+                        <div>
+                            <label asp-for="PhoneNumber" class="title-orange">Phone Number</label>
+                            <input type="tel" asp-for="PhoneNumber" class="form-control orange-border w-100" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+
+                        <div>
+                            <label asp-for="Email" class="title-orange">Email</label>
+                            <input type="email" asp-for="Email" class="form-control orange-border w-100" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div>
+                            <label asp-for="Password" class="title-orange">Password</label>
+                            <input type="password" asp-for="Password" class="form-control orange-border w-100" />
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+
+                        <div>
+                            <label asp-for="Role" class="title-orange">Role</label>
+                            <select asp-for="Role" class="form-control orange-border w-100">
+                                <option value="">Select Role</option>
+                                <option value="Admin">Admin</option>
+                                <option value="Teacher">Teacher</option>
+                                <option value="Student">Student</option>
+                            </select>
+                            <span asp-validation-for="Role" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-register w-100 mt-3">Register</button>
+                </form>
+
+            </div>
         </div>
+
+        <!-- RIGHT: BACKGROUND + TEXT -->
+        <div class="col-sm-6 right-bg d-flex align-items-center justify-content-center">
+            <div class="right-text">
+                Student Information<br />
+                Management System
+            </div>
+        </div>
+
     </div>
 </div>
