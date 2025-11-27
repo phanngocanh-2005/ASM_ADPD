@@ -90,30 +90,16 @@
 
         <!-- Logo BTEC đúng đường dẫn -->
         <img src="/Figure/Btec.png" class="btec-logo" alt="BTEC Logo" />
-          @if (ViewBag.ErrorMessage != null)
-             {
-            <div class="alert alert-danger mb-3" role="alert" style="white-space: pre-line;">
-                @Html.Raw(ViewBag.ErrorMessage)
-            </div>
-            }
-        <form asp-action="Login" asp-controller="Login" method="post" autocomplete="off">
+
+        <form asp-action="Login" method="post">
             <div class="mb-3">
                 <label>Username</label>
-                <input type="text"
-                       name="username"
-                       class="form-control"
-                       required
-                       value="@ViewBag.Username"
-                       autocomplete="off" />
+                <input type="text" name="username" class="form-control" required />
             </div>
 
             <div class="mb-3">
                 <label>Password</label>
-                <input type="password"
-                       name="password"
-                       class="form-control"
-                       required
-                       autocomplete="new-password" />
+                <input type="password" name="password" class="form-control" required />
             </div>
 
             <div class="mb-3">
@@ -130,3 +116,6 @@
                 Login
             </button>
         </form>
+
+    </div>
+</div>
