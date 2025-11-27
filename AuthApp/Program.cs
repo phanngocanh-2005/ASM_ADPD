@@ -1,5 +1,6 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using AuthApp.Data;
+using Microsoft.AspNetCore.Authentication.Cookies; // ⭐ CẦN THÊM DÒNG NÀY ⭐
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,18 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection")
         )
 );
+
+// ⭐ BỔ SUNG BƯỚC 1: ĐĂNG KÝ DỊCH VỤ AUTHENTICATION ⭐
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.Cookie.Name = "AuthCookie";
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+        options.SlidingExpiration = true;
+        // Tùy chọn: Đặt trang đăng nhập mặc định
+        // options.LoginPath = "/Login/Index"; 
+    });
+
 
 builder.Services.AddSession(
     option => option.IdleTimeout = TimeSpan.FromMinutes(5)
@@ -31,7 +44,10 @@ app.UseStaticFiles();
 app.UseSession();
 app.UseRouting();
 
-app.UseAuthorization();
+// ⭐ BỔ SUNG BƯỚC 2: THÊM MIDDLEWARE AUTHENTICATION (Phải đặt trước UseAuthorization) ⭐
+app.UseAuthentication();
+
+app.UseAuthorization(); // Giữ nguyên vị trí sau UseAuthentication
 
 app.MapControllerRoute(
     name: "default",
