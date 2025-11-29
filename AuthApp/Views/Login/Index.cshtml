@@ -1,6 +1,16 @@
 ﻿@{
+    Layout = null;
 }
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - AuthApp</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+</head>
+<body>
 <style>
     :root {
         --btec-orange: #FF6600;
@@ -88,7 +98,7 @@
 <div class="bg-full">
     <div class="login-box">
 
-        <!-- Logo BTEC đúng đường dẫn -->
+        <!-- BTEC logo with correct path -->
         <img src="/Figure/Btec.png" class="btec-logo" alt="BTEC Logo" />
 
         <form asp-action="Login" method="post">
@@ -119,3 +129,8 @@
 
     </div>
 </div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

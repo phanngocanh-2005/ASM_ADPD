@@ -10,7 +10,6 @@ namespace AuthApp.Controllers
     public class TaskController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private int id;
 
         public TaskController(ApplicationDbContext context)
         {
@@ -72,7 +71,7 @@ namespace AuthApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditTask(string name, string description)
+        public async Task<IActionResult> EditTask(int id, string name, string description)
         {
             try
             {

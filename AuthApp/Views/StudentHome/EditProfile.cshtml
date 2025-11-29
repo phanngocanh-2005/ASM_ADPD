@@ -1,0 +1,143 @@
+
+@model AuthApp.Models.Student
+@{
+    ViewData["Title"] = "Edit My Profile";
+    var genderOptions = ViewBag.Genders as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>();
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4 text-primary">
+        <i class="fas fa-edit"></i> Edit My Profile
+    </h2>
+    <hr />
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <div class="row">
+        <div class="col-md-8">
+            <form asp-action="EditProfile" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="AccountId" />
+                <input type="hidden" asp-for="StudentCode" />
+                <input type="hidden" asp-for="AcademicProgramId" />
+                <input type="hidden" asp-for="EnrollmentDate" />
+                <input type="hidden" asp-for="Status" />
+                <input type="hidden" asp-for="GPA" />
+                <input type="hidden" asp-for="CreatedAt" />
+
+                <div class="card shadow-sm mb-3">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Personal Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label asp-for="StudentCode" class="form-label">Student ID</label>
+                            <input asp-for="StudentCode" class="form-control" readonly />
+                            <span asp-validation-for="StudentCode" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="FullName" class="form-label">Full Name</label>
+                            <input asp-for="FullName" class="form-control" />
+                            <span asp-validation-for="FullName" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="DateOfBirth" class="form-label">Date of Birth</label>
+                            <input asp-for="DateOfBirth" type="date" class="form-control" />
+                            <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Gender" class="form-label">Gender</label>
+                            <select asp-for="Gender" class="form-select" asp-items="genderOptions">
+                                <option value="">-- Select Gender --</option>
+                            </select>
+                            <span asp-validation-for="Gender" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="PhoneNumber" class="form-label">Phone Number</label>
+                            <input asp-for="PhoneNumber" class="form-control" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Address" class="form-label">Address</label>
+                            <textarea asp-for="Address" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Address" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mb-3">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">Account Information</h5>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.Account != null)
+                        {
+                            <div class="mb-3">
+                                <label class="form-label">Username</label>
+                                <input type="text" class="form-control" value="@Model.Account.Username" readonly />
+                                <small class="text-muted">Username cannot be changed</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" name="Account.Email" class="form-control" value="@Model.Account.Email" />
+                                <span asp-validation-for="Account.Email" class="text-danger"></span>
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted">No account linked</p>
+                        }
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mb-3">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0">Academic Information (Read-only)</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Academic Program</label>
+                            <input type="text" class="form-control" value="@Model.AcademicProgram?.ProgramName" readonly />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Enrollment Date</label>
+                            <input type="text" class="form-control" value="@Model.EnrollmentDate.ToString("dd/MM/yyyy")" readonly />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            <input type="text" class="form-control" value="@Model.Status" readonly />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                    <a asp-action="Profile" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+

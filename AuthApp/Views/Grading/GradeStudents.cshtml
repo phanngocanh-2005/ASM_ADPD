@@ -1,0 +1,98 @@
+@model AuthApp.Models.ViewModels.GradeStudentsViewModel
+
+@{
+    ViewData["Title"] = "Nhập điểm môn học: " + Model.CourseName;
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>@ViewData["Title"]</h2>
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form asp-action="SaveGrades" method="post">
+                <input type="hidden" asp-for="CourseId" />
+                <input type="hidden" asp-for="CourseName" />
+
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Mã SV</th>
+                                <th>Họ và tên</th>
+                                <th style="width: 150px;">Điểm (0-100)</th>
+                                <th>Ghi chú</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.Students.Count; i++)
+                            {
+                                var student = Model.Students[i];
+                                <tr>
+                                    <td>
+                                        @student.StudentCode
+                                        <input type="hidden" asp-for="Students[i].StudentId" />
+                                        <input type="hidden" asp-for="Students[i].StudentCode" />
+                                        <input type="hidden" asp-for="Students[i].StudentName" />
+                                        <input type="hidden" asp-for="Students[i].MaxScore" />
+                                    </td>
+                                    <td>@student.StudentName</td>
+                                    <td>
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" 
+                                                   asp-for="Students[i].Grade" 
+                                                   value="@(student.Grade ?? student.ExistingGrade)"
+                                                   min="0" max="100" step="0.01" />
+                                            <span class="input-group-text">/ @student.MaxScore</span>
+                                        </div>
+                                        <span asp-validation-for="Students[i].Grade" class="text-danger"></span>
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control" 
+                                               asp-for="Students[i].Notes" 
+                                               value="@student.Notes" />
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="d-flex justify-content-end mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Lưu điểm
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        // Tự động chuyển sang ô nhập liệu tiếp theo khi nhập đủ 2 chữ số
+        $(document).ready(function() {
+            $('input[type="number"]').on('input', function() {
+                var value = $(this).val();
+                if (value.length >= 2 && value <= 10) {
+                    $(this).next('input').focus();
+                }
+            });
+        });
+    </script>
+}

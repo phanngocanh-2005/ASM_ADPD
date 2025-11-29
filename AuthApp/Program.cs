@@ -1,33 +1,45 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using AuthApp.Data;
-using Microsoft.AspNetCore.Authentication.Cookies; // ⭐ CẦN THÊM DÒNG NÀY ⭐
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+// Configure DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")
-        )
+    )
 );
 
-// ⭐ BỔ SUNG BƯỚC 1: ĐĂNG KÝ DỊCH VỤ AUTHENTICATION ⭐
+// Configure Authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
         options.Cookie.Name = "AuthCookie";
         options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+        options.LoginPath = "/Login/TeacherLogin";
+        options.AccessDeniedPath = "/Home/AccessDenied";
         options.SlidingExpiration = true;
-        // Tùy chọn: Đặt trang đăng nhập mặc định
-        // options.LoginPath = "/Login/Index"; 
     });
 
+// Configure Authorization
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("RequireTeacherRole", 
+        policy => policy.RequireRole("Teacher"));
+});
 
-builder.Services.AddSession(
-    option => option.IdleTimeout = TimeSpan.FromMinutes(5)
-    );
+// Configure Session
+builder.Services.AddSession(options => 
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 var app = builder.Build();
 
@@ -35,19 +47,23 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-app.UseSession();
 app.UseRouting();
 
-// ⭐ BỔ SUNG BƯỚC 2: THÊM MIDDLEWARE AUTHENTICATION (Phải đặt trước UseAuthorization) ⭐
+// Important: Authentication must come before Authorization
 app.UseAuthentication();
+app.UseAuthorization();
 
-app.UseAuthorization(); // Giữ nguyên vị trí sau UseAuthentication
+app.UseSession();
+
+app.MapControllerRoute(
+    name: "teacherLogin",
+    pattern: "dang-nhap-giao-vien",
+    defaults: new { controller = "Login", action = "TeacherLogin" });
 
 app.MapControllerRoute(
     name: "default",

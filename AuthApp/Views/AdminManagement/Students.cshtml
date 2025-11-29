@@ -1,0 +1,74 @@
+@model IEnumerable<AuthApp.Models.Student>
+
+@{
+    ViewData["Title"] = "Student Management";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="text-primary">Student list</h2>
+        <a asp-action="CreateStudent" class="btn btn-success">
+            <i class="fas fa-user-plus"></i> Add student
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <table class="table table-bordered table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>Student ID</th>
+                <th>Full name</th>
+                <th>Program</th>
+                <th>Status</th>
+                <th>GPA</th>
+                <th>Enrollment date</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var student in Model)
+            {
+                <tr>
+                    <td>@student.StudentCode</td>
+                    <td>
+                        <div class="fw-semibold">@student.FullName</div>
+                        <div class="text-muted small">@student.Account?.Email</div>
+                    </td>
+                    <td>
+                        @if (student.AcademicProgram != null)
+                        {
+                            <span class="badge bg-primary">@student.AcademicProgram.ProgramCode</span>
+                            <br />
+                            <small class="text-muted">@student.AcademicProgram.ProgramName</small>
+                        }
+                        else
+                        {
+                            <span class="text-muted">No program</span>
+                        }
+                    </td>
+                    <td>
+                        <span class="badge @(student.Status == "Active" ? "bg-success" : "bg-secondary")">
+                            @student.Status
+                        </span>
+                    </td>
+                    <td>@(student.GPA?.ToString("0.00") ?? "-")</td>
+                    <td>@student.EnrollmentDate.ToString("dd/MM/yyyy")</td>
+                    <td class="text-end">
+                        <a asp-action="StudentProfile" asp-route-id="@student.Id" class="btn btn-sm btn-outline-info me-1">View Profile</a>
+                        <a asp-action="EditStudent" asp-route-id="@student.Id" class="btn btn-sm btn-outline-primary me-1">Edit</a>
+                        <a asp-action="DeleteStudent" asp-route-id="@student.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+

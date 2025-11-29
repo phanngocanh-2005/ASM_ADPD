@@ -1,0 +1,51 @@
+@model AuthApp.Models.AcademicProgram
+
+@{
+    ViewData["Title"] = "Add academic program";
+    var statusOptions = ViewBag.ProgramStatuses as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>();
+}
+
+<div class="container mt-4">
+    <h2 class="text-primary mb-3">Add academic program</h2>
+    <form asp-action="CreateProgram" method="post" class="row g-3">
+        <div class="col-md-4">
+            <label asp-for="ProgramCode" class="form-label"></label>
+            <input asp-for="ProgramCode" class="form-control" />
+            <span asp-validation-for="ProgramCode" class="text-danger"></span>
+        </div>
+        <div class="col-md-8">
+            <label asp-for="ProgramName" class="form-label"></label>
+            <input asp-for="ProgramName" class="form-control" />
+            <span asp-validation-for="ProgramName" class="text-danger"></span>
+        </div>
+        <div class="col-12">
+            <label asp-for="Description" class="form-label"></label>
+            <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="Duration" class="form-label">Duration (terms)</label>
+            <input asp-for="Duration" class="form-control" />
+            <span asp-validation-for="Duration" class="text-danger"></span>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="CreditsRequired" class="form-label">Credits required</label>
+            <input asp-for="CreditsRequired" class="form-control" />
+            <span asp-validation-for="CreditsRequired" class="text-danger"></span>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="Status" class="form-label"></label>
+            <select asp-for="Status" class="form-select" asp-items="statusOptions"></select>
+            <span asp-validation-for="Status" class="text-danger"></span>
+        </div>
+        <div class="col-12 d-flex justify-content-end">
+            <a asp-action="Programs" class="btn btn-secondary me-2">Cancel</a>
+            <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}
+

@@ -1,0 +1,91 @@
+@model AuthApp.Models.Student
+
+@{
+    ViewData["Title"] = "Update student";
+    var programOptions = ViewBag.ProgramOptions as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>();
+    var statusOptions = ViewBag.StudentStatuses as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>();
+    var genderOptions = ViewBag.GenderOptions as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>();
+}
+
+<div class="container mt-4">
+    <h2 class="text-primary mb-3">Update: @Model.FullName</h2>
+    <form asp-action="EditStudent" method="post" class="row g-3">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="AccountId" />
+        <div class="col-md-6">
+            <label class="form-label">Account Username</label>
+            <input type="text" name="AccountUsername" class="form-control" value="@Model.Account?.Username" />
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Email</label>
+            <input type="email" name="AccountEmail" class="form-control" value="@Model.Account?.Email" />
+            <span class="text-danger" id="email-validation"></span>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="StudentCode" class="form-label"></label>
+            <input asp-for="StudentCode" class="form-control" />
+            <span asp-validation-for="StudentCode" class="text-danger"></span>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="FullName" class="form-label"></label>
+            <input asp-for="FullName" class="form-control" />
+            <span asp-validation-for="FullName" class="text-danger"></span>
+        </div>
+        <div class="col-md-3">
+            <label asp-for="DateOfBirth" class="form-label"></label>
+            <input asp-for="DateOfBirth" type="date" class="form-control" />
+            <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+        </div>
+        <div class="col-md-3">
+            <label asp-for="Gender" class="form-label"></label>
+            <select asp-for="Gender" class="form-select" asp-items="genderOptions"></select>
+            <span asp-validation-for="Gender" class="text-danger"></span>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="PhoneNumber" class="form-label"></label>
+            <input asp-for="PhoneNumber" class="form-control" />
+            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+        </div>
+        <div class="col-md-8">
+            <label asp-for="Address" class="form-label"></label>
+            <input asp-for="Address" class="form-control" />
+            <span asp-validation-for="Address" class="text-danger"></span>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="AcademicProgramId" class="form-label">Academic Program <span class="text-muted">(optional)</span></label>
+            <select asp-for="AcademicProgramId" class="form-select" asp-items="programOptions">
+                <option value="">-- Select program (optional) --</option>
+            </select>
+            <span asp-validation-for="AcademicProgramId" class="text-danger"></span>
+            @if (!programOptions.Any())
+            {
+                <small class="text-warning">No academic programs available. Please create programs first.</small>
+            }
+        </div>
+        <div class="col-md-4">
+            <label asp-for="EnrollmentDate" class="form-label"></label>
+            <input asp-for="EnrollmentDate" type="date" class="form-control" />
+            <span asp-validation-for="EnrollmentDate" class="text-danger"></span>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="GPA" class="form-label">Score (0 - 100)</label>
+            <input asp-for="GPA" type="number" min="0" max="100" step="0.1" class="form-control" />
+            <span asp-validation-for="GPA" class="text-danger"></span>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="Status" class="form-label"></label>
+            <select asp-for="Status" class="form-select" asp-items="statusOptions"></select>
+            <span asp-validation-for="Status" class="text-danger"></span>
+        </div>
+        <div class="col-12 d-flex justify-content-end">
+            <a asp-action="StudentProfile" asp-route-id="@Model.Id" class="btn btn-secondary me-2">Back to Profile</a>
+            <a asp-action="Students" class="btn btn-outline-secondary me-2">Cancel</a>
+            <button type="submit" class="btn btn-primary">Save changes</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}
+

@@ -1,0 +1,90 @@
+﻿@model List<AuthApp.Models.Account>
+
+@{
+    var roleFilter = ((string?)ViewBag.RoleFilter ?? "All");
+    var headerTitle = ((string?)ViewBag.HeaderTitle ?? "User Account Management");
+    var allowRoleFilter = (bool?)(ViewBag.AllowRoleFilter) ?? true;
+    var roleLabel = ((string?)ViewBag.RoleLabel ?? "All");
+
+    string FilterClass(string roleName) =>
+        roleFilter.Equals(roleName, StringComparison.OrdinalIgnoreCase)
+            ? "btn btn-outline-primary active"
+            : "btn btn-outline-primary";
+
+    string createLabel = roleFilter switch
+    {
+        "Admin" => "Create Admin Account",
+        "Teacher" => "Create Teacher Account",
+        "Student" => "Create Student Account",
+        _ => "Create New Account"
+    };
+
+    var createRouteRole = roleFilter.Equals("All", StringComparison.OrdinalIgnoreCase) ? null : roleFilter;
+}
+
+<h1 class="text-center text-primary mb-4">@headerTitle</h1>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <a asp-action="CreateAccount" asp-route-role="@createRouteRole" class="btn btn-success">
+        <i class="fas fa-plus-circle"></i> @createLabel
+    </a>
+    @if (allowRoleFilter)
+    {
+        <div class="btn-group" role="group" aria-label="Role filter">
+            <a asp-action="ListAccounts" asp-route-role="All" class="@FilterClass("All")">All</a>
+            <a asp-action="ListAccounts" asp-route-role="Admin" class="@FilterClass("Admin")">Admins</a>
+            <a asp-action="ListAccounts" asp-route-role="Teacher" class="@FilterClass("Teacher")">Teachers</a>
+            <a asp-action="ListAccounts" asp-route-role="Student" class="@FilterClass("Student")">Students</a>
+        </div>
+    }
+    else
+    {
+        <div class="btn-group" role="group" aria-label="Role filter (disabled)">
+            <span class="btn btn-primary active">@roleLabel</span>
+        </div>
+    }
+</div>
+
+<table class="table table-bordered table-striped">
+    <thead class="bg-primary text-white">
+        <tr>
+            <th>Username</th>
+            <th>Full name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Created</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (!Model.Any())
+        {
+            <tr>
+                <td colspan="6" class="text-center text-muted py-4">
+                    No accounts found for the selected filter.
+                </td>
+            </tr>
+        }
+        else
+        {
+            foreach (var account in Model)
+            {
+                <tr>
+                    <td>@account.Username</td>
+                    <td>@account.Fullname</td>
+                    <td>@account.Email</td>
+                    <td>
+                        <span class="badge @(account.Role == "Admin" ? "bg-danger" : account.Role == "Teacher" ? "bg-warning text-dark" : "bg-info")">
+                            @account.Role
+                        </span>
+                    </td>
+                    <td>@account.CreatedAt.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        <a asp-action="EditAccount" asp-route-id="@account.Id" class="btn btn-sm btn-primary">Edit</a>
+                        <a asp-action="DeleteAccount" asp-route-id="@account.Id" class="btn btn-sm btn-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

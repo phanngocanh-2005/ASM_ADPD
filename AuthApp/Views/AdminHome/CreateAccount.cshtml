@@ -1,0 +1,90 @@
+﻿@model AuthApp.Models.Account
+
+@{
+    var fixedRole = ViewBag.FixedRole as string;
+    var roles = ViewBag.Roles as List<string> ?? new List<string>();
+    var heading = fixedRole != null ? $"Create {fixedRole} Account" : "Create New Account";
+    ViewData["Title"] = heading;
+}
+
+<div class="container mt-5">
+    <h2 class="mb-4 text-primary">@heading</h2>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-6">
+            <form asp-action="CreateAccount" asp-route-role="@fixedRole" method="post">
+
+                @if (ViewBag.ErrorMessage != null)
+                {
+                    <div class="alert alert-danger" role="alert">
+                        @Html.Raw(ViewBag.ErrorMessage)
+                    </div>
+                }
+
+                <div class="mb-3">
+                    <label asp-for="Username" class="form-label"></label>
+                    <input asp-for="Username" class="form-control" />
+                    <span asp-validation-for="Username" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Fullname" class="form-label"></label>
+                    <input asp-for="Fullname" class="form-control" />
+                    <span asp-validation-for="Fullname" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Password" class="form-label"></label>
+                    <input asp-for="Password" type="password" class="form-control" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label"></label>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="PhoneNumber" class="form-label"></label>
+                    <input asp-for="PhoneNumber" class="form-control" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                </div>
+
+                @if (fixedRole == null)
+                {
+                    <div class="mb-3">
+                        <label asp-for="Role" class="form-label">Role</label>
+                        <select asp-for="Role" class="form-select">
+                            <option value="">-- Select role --</option>
+                            @foreach (var role in roles)
+                            {
+                                <option value="@role">@role</option>
+                            }
+                        </select>
+                        <span asp-validation-for="Role" class="text-danger"></span>
+                    </div>
+                }
+                else
+                {
+                    <input type="hidden" asp-for="Role" value="@fixedRole" />
+                    <div class="mb-3">
+                        <label class="form-label">Role</label>
+                        <input class="form-control" value="@fixedRole" readonly />
+                    </div>
+                }
+
+                <button type="submit" class="btn btn-primary me-2">@heading</button>
+                <a asp-action="ListAccounts" class="btn btn-secondary">Cancel</a>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -58,16 +58,16 @@
                                            disabled />
                                 </td>
                                 <td>
-                                    @t.Category.Name
+                                    @(t.Category?.Name ?? "N/A")
                                 </td>
                                 <td>
-                                    @t.Account.Fullname
+                                    @(t.Account?.Fullname ?? "N/A")
                                 </td>
                                 <td>
-                                    <button class="btn btn-outline-warning w-100" onclick="enableEditing(@t.Id)" id="btnEnableEditing">
+                                    <button class="btn btn-outline-warning w-100" onclick="enableEditing(@t.Id)" id="btnEnableEditing-@t.Id">
                                         Edit
                                     </button>
-                                    <button class="btn btn-outline-success w-100 d-none" onclick="submitEdit(@t.Id)" id="btnSaveEdit">
+                                    <button class="btn btn-outline-success w-100 d-none" onclick="submitEdit(@t.Id)" id="btnSaveEdit-@t.Id">
                                         Save
                                     </button>
 
@@ -89,8 +89,8 @@
 
 <script>
     function enableEditing(id){
-        document.getElementById("btnSaveEdit").classList.remove("d-none");
-        document.getElementById("btnEnableEditing").classList.add("d-none");
+        document.getElementById("btnSaveEdit-" + id).classList.remove("d-none");
+        document.getElementById("btnEnableEditing-" + id).classList.add("d-none");
         var inputName = document.getElementById("input-name-task" + id);
         var inputDescription = document.getElementById("input-description-task" + id)
         inputName.disabled = false;
@@ -112,8 +112,8 @@
                      //update view
                       inputName.disabled = true;
                       inputDescription.disabled = true;
-                      document.getElementById("btnSaveEdit").classList.add("d-none");
-                        document.getElementById("btnEnableEditing").classList.remove("d-none");
+                      document.getElementById("btnSaveEdit-" + id).classList.add("d-none");
+                        document.getElementById("btnEnableEditing-" + id).classList.remove("d-none");
                  }else{
                       alert("Error occured!");
                  }

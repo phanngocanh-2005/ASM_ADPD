@@ -1,0 +1,76 @@
+@model IEnumerable<AuthApp.Models.Teacher>
+
+@{
+    ViewData["Title"] = "Teacher Management";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="text-primary">Teacher list</h2>
+        <a asp-action="CreateTeacher" class="btn btn-success">
+            <i class="fas fa-user-plus"></i> Add teacher
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <table class="table table-bordered table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>Teacher ID</th>
+                <th>Full name</th>
+                <th>Program</th>
+                <th>Department</th>
+                <th>Status</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var teacher in Model)
+            {
+                <tr>
+                    <td>@teacher.TeacherCode</td>
+                    <td>
+                        <div class="fw-semibold">@teacher.FullName</div>
+                        <div class="text-muted small">@(teacher.Account?.Email ?? teacher.Email)</div>
+                    </td>
+                    <td>
+                        @if (teacher.AcademicProgram != null)
+                        {
+                            <span class="badge bg-primary">@teacher.AcademicProgram.ProgramCode</span>
+                            <br />
+                            <small class="text-muted">@teacher.AcademicProgram.ProgramName</small>
+                        }
+                        else
+                        {
+                            <span class="text-muted">-</span>
+                        }
+                    </td>
+                    <td>@(teacher.Department ?? "-")</td>
+                    <td>
+                        <span class="badge @(teacher.Status == "Active" ? "bg-success" : "bg-secondary")">
+                            @teacher.Status
+                        </span>
+                    </td>
+                    <td>@(teacher.Email ?? "-")</td>
+                    <td>@(teacher.PhoneNumber ?? "-")</td>
+                    <td class="text-end">
+                        <a asp-action="TeacherProfile" asp-route-id="@teacher.Id" class="btn btn-sm btn-outline-info me-1">View Profile</a>
+                        <a asp-action="EditTeacher" asp-route-id="@teacher.Id" class="btn btn-sm btn-outline-primary me-1">Edit</a>
+                        <a asp-action="DeleteTeacher" asp-route-id="@teacher.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+

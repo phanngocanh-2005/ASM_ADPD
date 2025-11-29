@@ -1,0 +1,96 @@
+@model AuthApp.Models.Teacher
+
+@{
+    ViewData["Title"] = "Add teacher";
+    var statusOptions = ViewBag.TeacherStatuses as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>();
+    var genderOptions = ViewBag.GenderOptions as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>();
+    var programOptions = ViewBag.ProgramOptions as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>();
+    var accountOptions = ViewBag.TeacherAccounts as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>();
+}
+
+<div class="container mt-4">
+    <h2 class="text-primary mb-3">Add new teacher</h2>
+    <form asp-action="CreateTeacher" method="post" class="row g-3">
+        <div class="col-md-6">
+            <label asp-for="AccountId" class="form-label">Link teacher account <span class="text-muted">(optional)</span></label>
+            <select asp-for="AccountId" class="form-select" asp-items="accountOptions">
+                <option value="">-- Select teacher account --</option>
+            </select>
+            <span class="form-text text-muted">Only teacher accounts not yet linked will appear.</span>
+            <span asp-validation-for="AccountId" class="text-danger"></span>
+        </div>
+        @if (!accountOptions.Any())
+        {
+            <div class="col-12">
+                <div class="alert alert-warning py-2">No unassigned teacher accounts available. Create an account first or leave this blank.</div>
+            </div>
+        }
+        <div class="col-md-6">
+            <label asp-for="TeacherCode" class="form-label"></label>
+            <input asp-for="TeacherCode" class="form-control" />
+            <span asp-validation-for="TeacherCode" class="text-danger"></span>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="FullName" class="form-label"></label>
+            <input asp-for="FullName" class="form-control" />
+            <span asp-validation-for="FullName" class="text-danger"></span>
+        </div>
+        <div class="col-md-3">
+            <label asp-for="DateOfBirth" class="form-label"></label>
+            <input asp-for="DateOfBirth" type="date" class="form-control" />
+            <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+        </div>
+        <div class="col-md-3">
+            <label asp-for="Gender" class="form-label"></label>
+            <select asp-for="Gender" class="form-select" asp-items="genderOptions">
+                <option value="">-- Select gender --</option>
+            </select>
+            <span asp-validation-for="Gender" class="text-danger"></span>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="PhoneNumber" class="form-label"></label>
+            <input asp-for="PhoneNumber" class="form-control" />
+            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="Email" class="form-label"></label>
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="Department" class="form-label"></label>
+            <input asp-for="Department" class="form-control" />
+            <span asp-validation-for="Department" class="text-danger"></span>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="Specialization" class="form-label"></label>
+            <input asp-for="Specialization" class="form-control" />
+            <span asp-validation-for="Specialization" class="text-danger"></span>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="AcademicProgramId" class="form-label">Program</label>
+            <select asp-for="AcademicProgramId" class="form-select" asp-items="programOptions">
+                <option value="">-- Select program (optional) --</option>
+            </select>
+            <span asp-validation-for="AcademicProgramId" class="text-danger"></span>
+        </div>
+        <div class="col-md-3">
+            <label asp-for="Status" class="form-label"></label>
+            <select asp-for="Status" class="form-select" asp-items="statusOptions"></select>
+            <span asp-validation-for="Status" class="text-danger"></span>
+        </div>
+        <div class="col-md-3">
+            <label asp-for="CreatedAt" class="form-label">Created at</label>
+            <input asp-for="CreatedAt" type="datetime-local" class="form-control" value="@Model.CreatedAt.ToString("yyyy-MM-ddTHH:mm")" readonly />
+        </div>
+        <div class="col-12 d-flex justify-content-end">
+            <a asp-action="Teachers" class="btn btn-secondary me-2">Cancel</a>
+            <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}
+

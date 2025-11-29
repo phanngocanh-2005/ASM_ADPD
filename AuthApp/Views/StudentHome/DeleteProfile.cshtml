@@ -1,0 +1,67 @@
+@model AuthApp.Models.Student
+
+@{
+    ViewData["Title"] = "Delete My Profile";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-exclamation-triangle"></i> Delete Profile Confirmation
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning" role="alert">
+                        <strong>Warning!</strong> This action cannot be undone. Deleting your profile will permanently remove all your information from the system.
+                    </div>
+
+                    <h5 class="mb-3">Are you sure you want to delete your profile?</h5>
+
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <th width="30%">Student ID:</th>
+                                    <td><strong>@Model.StudentCode</strong></td>
+                                </tr>
+                                <tr>
+                                    <th>Full Name:</th>
+                                    <td>@Model.FullName</td>
+                                </tr>
+                                <tr>
+                                    <th>Email:</th>
+                                    <td>@(Model.Account?.Email ?? "-")</td>
+                                </tr>
+                                <tr>
+                                    <th>Academic Program:</th>
+                                    <td>@Model.AcademicProgram?.ProgramName</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+                    }
+
+                    <form asp-action="DeleteProfile" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Profile" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Yes, Delete My Profile
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

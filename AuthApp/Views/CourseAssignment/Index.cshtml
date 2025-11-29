@@ -1,0 +1,70 @@
+@model IEnumerable<AuthApp.Models.CourseAssignment>
+
+@{
+    ViewData["Title"] = "Quản lý phân công giảng dạy";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>@ViewData["Title"]</h2>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Tạo phân công mới
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            @if (Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Giáo viên</th>
+                                <th>Môn học</th>
+                                <th>Ngày phân công</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@item.Teacher?.FullName</td>
+                                    <td>@item.Course?.CourseName (@item.Course?.CourseCode)</td>
+                                    <td>@item.AssignmentDate.ToString("dd/MM/yyyy")</td>
+                                    <td>
+                                        <span class="badge @(item.Status == "Active" ? "bg-success" : "bg-secondary")">
+                                            @item.Status
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger" 
+                                           onclick="return confirm('Bạn có chắc chắn muốn xóa phân công này?')">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> Chưa có phân công nào được tạo.
+                </div>
+            }
+        </div>
+    </div>
+</div>

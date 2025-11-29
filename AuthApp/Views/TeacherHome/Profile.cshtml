@@ -1,0 +1,230 @@
+@model AuthApp.Models.Teacher
+
+@{
+    ViewData["Title"] = "My Teaching Profile";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary">
+            <i class="fas fa-id-card-alt"></i> My Teaching Profile
+        </h2>
+        <div>
+            <a asp-action="EditProfile" class="btn btn-primary">
+                <i class="fas fa-edit"></i> Update Profile
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-user"></i> Personal Information</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless mb-0">
+                        <tr>
+                            <th width="35%">Teacher Code</th>
+                            <td><strong>@Model.TeacherCode</strong></td>
+                        </tr>
+                        <tr>
+                            <th>Full Name</th>
+                            <td>@Model.FullName</td>
+                        </tr>
+                        <tr>
+                            <th>Date of Birth</th>
+                            <td>@(Model.DateOfBirth?.ToString("dd/MM/yyyy") ?? "-")</td>
+                        </tr>
+                        <tr>
+                            <th>Gender</th>
+                            <td>@(Model.Gender ?? "-")</td>
+                        </tr>
+                        <tr>
+                            <th>Phone</th>
+                            <td>@(Model.PhoneNumber ?? "-")</td>
+                        </tr>
+                        <tr>
+                            <th>Email</th>
+                            <td>@(Model.Email ?? Model.Account?.Email ?? "-")</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-briefcase"></i> Professional Details</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless mb-0">
+                        <tr>
+                            <th width="35%">Account</th>
+                            <td>
+                                @if (Model.Account != null)
+                                {
+                                    <span class="badge bg-success">@Model.Account.Username</span>
+                                    <div class="small text-muted">@Model.Account.Email</div>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Not linked</span>
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Department</th>
+                            <td>@(Model.Department ?? "-")</td>
+                        </tr>
+                        <tr>
+                            <th>Specialization</th>
+                            <td>@(Model.Specialization ?? "-")</td>
+                        </tr>
+                        <tr>
+                            <th>Program</th>
+                            <td>
+                                @if (Model.AcademicProgram != null)
+                                {
+                                    <span class="badge bg-primary">@Model.AcademicProgram.ProgramCode</span>
+                                    <div class="small text-muted">@Model.AcademicProgram.ProgramName</div>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">No program assigned</span>
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Status</th>
+                            <td>
+                                <span class="badge @(Model.Status == "Active" ? "bg-success" : "bg-secondary")">
+                                    @Model.Status
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Joined</th>
+                            <td>@Model.CreatedAt.ToString("dd/MM/yyyy")</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="fas fa-book"></i> Assigned Courses</h5>
+        </div>
+        <div class="card-body">
+            @if (Model.CourseAssignments.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-striped align-middle">
+                        <thead>
+                            <tr>
+                                <th>Course Code</th>
+                                <th>Course Name</th>
+                                <th>Assigned Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var assignment in Model.CourseAssignments.OrderByDescending(ca => ca.AssignmentDate))
+                            {
+                                <tr>
+                                    <td>@assignment.Course?.CourseCode</td>
+                                    <td>@assignment.Course?.CourseName</td>
+                                    <td>@assignment.AssignmentDate.ToString("dd/MM/yyyy")</td>
+                                    <td>
+                                        <span class="badge @(assignment.Status == "Active" ? "bg-primary" : assignment.Status == "Completed" ? "bg-success" : "bg-secondary")">
+                                            @assignment.Status
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p class="text-muted mb-0">No course assignments yet.</p>
+            }
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Grading Records</h5>
+        </div>
+        <div class="card-body">
+            @if (Model.AcademicRecords.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Course</th>
+                                <th>Student</th>
+                                <th>Assignment</th>
+                                <th>Score</th>
+                                <th>Weight (%)</th>
+                                <th>Graded Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var record in Model.AcademicRecords.OrderByDescending(ar => ar.GradedDate ?? ar.CreatedAt))
+                            {
+                                <tr>
+                                    <td>
+                                        <strong>@record.Course?.CourseCode</strong><br />
+                                        <small class="text-muted">@record.Course?.CourseName</small>
+                                    </td>
+                                    <td>
+                                        @if (record.Student != null)
+                                        {
+                                            <strong>@record.Student.StudentCode</strong><br />
+                                            <small class="text-muted">@record.Student.FullName</small>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </td>
+                                    <td>@record.AssignmentType</td>
+                                    <td><strong>@record.Score.ToString("0.00") / @record.MaxScore.ToString("0.00")</strong></td>
+                                    <td>@(record.Weight?.ToString("0.00") ?? "-")</td>
+                                    <td>@(record.GradedDate?.ToString("dd/MM/yyyy") ?? "-")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p class="text-muted mb-0">No grading records yet.</p>
+            }
+        </div>
+    </div>
+</div>
+
+

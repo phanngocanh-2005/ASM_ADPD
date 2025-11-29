@@ -1,0 +1,26 @@
+@{
+    var shortcuts = new[]
+    {
+        new { Text = "Admin Accounts",  Action = "AdminAccounts",       Controller = "AdminHome",        Css = "btn btn-outline-primary" },
+        new { Text = "Academic Programs", Action = "Programs",         Controller = "AdminManagement", Css = "btn btn-outline-info" },
+        new { Text = "Teacher Accounts", Action = "TeacherAccounts",   Controller = "AdminHome",        Css = "btn btn-outline-warning" },
+        new { Text = "Student Accounts", Action = "StudentAccounts",   Controller = "AdminHome",        Css = "btn btn-outline-success" },
+        new { Text = "Student Profiles", Action = "Students",          Controller = "AdminManagement", Css = "btn btn-outline-success" },
+        new { Text = "Teacher Profiles", Action = "Teachers",          Controller = "AdminManagement", Css = "btn btn-outline-warning" },
+        new { Text = "Course Assignments", Action = "Index",          Controller = "CourseAssignment", Css = "btn btn-outline-secondary" }
+    };
+}
+
+<div class="admin-shortcuts my-3">
+    <div class="d-flex flex-wrap gap-2">
+        @foreach (var shortcut in shortcuts)
+        {
+            <a asp-controller="@shortcut.Controller"
+               asp-action="@shortcut.Action"
+               class="@shortcut.Css">
+                @shortcut.Text
+            </a>
+        }
+    </div>
+</div>
+

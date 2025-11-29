@@ -1,0 +1,57 @@
+@model IEnumerable<AuthApp.Models.AcademicProgram>
+
+@{
+    ViewData["Title"] = "Academic Program Management";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="text-primary">Academic Programs</h2>
+        <a asp-action="CreateProgram" class="btn btn-success">
+            <i class="fas fa-plus-circle"></i> Add program
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <table class="table table-striped table-hover">
+        <thead class="table-primary">
+            <tr>
+                <th>Code</th>
+                <th>Program name</th>
+                <th>Credits</th>
+                <th>Duration</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var program in Model)
+            {
+                <tr>
+                    <td>@program.ProgramCode</td>
+                    <td>@program.ProgramName</td>
+                    <td>@(program.CreditsRequired?.ToString() ?? "-")</td>
+                    <td>@(program.Duration?.ToString() ?? "-")</td>
+                    <td>
+                        <span class="badge @(program.Status == "Active" ? "bg-success" : "bg-secondary")">
+                            @program.Status
+                        </span>
+                    </td>
+                    <td class="text-end">
+                        <a asp-action="EditProgram" asp-route-id="@program.Id" class="btn btn-sm btn-outline-primary me-1">Edit</a>
+                        <a asp-action="DeleteProgram" asp-route-id="@program.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+

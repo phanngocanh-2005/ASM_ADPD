@@ -7,7 +7,6 @@ namespace AuthApp.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
         private bool isConnected = false;
         private readonly ApplicationDbContext _context;
 
@@ -18,6 +17,23 @@ namespace AuthApp.Controllers
 
         public IActionResult Index()
         {
+            // Nếu đã đăng nhập, redirect đến dashboard tương ứng
+            if (User?.Identity?.IsAuthenticated == true)
+            {
+                if (User.IsInRole("Admin"))
+                {
+                    return RedirectToAction("Index", "AdminHome");
+                }
+                else if (User.IsInRole("Teacher"))
+                {
+                    return RedirectToAction("Index", "TeacherHome");
+                }
+                else if (User.IsInRole("Student"))
+                {
+                    return RedirectToAction("Index", "StudentHome");
+                }
+            }
+
             this.isConnected = _context.Database.CanConnect();
             ViewBag.IsConnected = isConnected;
             ViewBag.Username = HttpContext.Session.GetString("Username");

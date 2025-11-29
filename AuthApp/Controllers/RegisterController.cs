@@ -25,51 +25,47 @@ namespace AuthApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RegisterAccount(Account model)
         {
-            // Cờ (flag) để theo dõi xem có lỗi trùng lặp nào xảy ra hay không
+            // Flag to determine whether any duplicate constraint violations occur
             bool hasDuplicateError = false;
 
-            // 1. KIỂM TRA VALIDATION TỪ MODEL (Bắt buộc điền đầy đủ trường)
-            // Nếu Validation thất bại (thiếu trường), trả lại View ngay
+            // Step 1: validate model; return immediately if a required field is missing
             if (!ModelState.IsValid)
             {
                 return View("Index", model);
             }
 
-            // 2. KIỂM TRA TRÙNG LẶP USERNAME
+            // Step 2: check duplicate username
             if (await _context.Accounts.AnyAsync(a => a.Username == model.Username))
             {
                 ModelState.AddModelError("Username", "Username already exists. Please select another Username.");
                 hasDuplicateError = true;
             }
 
-            // 3. KIỂM TRA TRÙNG LẶP EMAIL
+            // Step 3: check duplicate email
             if (await _context.Accounts.AnyAsync(a => a.Email == model.Email))
             {
                 ModelState.AddModelError("Email", "Email already exists. Please select another Email.");
                 hasDuplicateError = true;
             }
 
-            // 4. KIỂM TRA TRÙNG LẶP PHONE NUMBER
+            // Step 4: check duplicate phone number
             if (await _context.Accounts.AnyAsync(a => a.PhoneNumber == model.PhoneNumber))
             {
                 ModelState.AddModelError("PhoneNumber", "Phonenumber already exists. Please select another Phonenumber");
                 hasDuplicateError = true;
             }
 
-            // 5. NẾU CÓ BẤT KỲ LỖI TRÙNG LẶP NÀO
+            // Step 5: if any duplicates were found, display validation errors
             if (hasDuplicateError)
             {
-                // Trả lại View để hiển thị tất cả các lỗi trùng lặp đã thu thập
                 return View("Index", model);
             }
 
-            // 6. ĐĂNG KÝ THÀNH CÔNG (Chỉ chạy khi không có lỗi Required và không có lỗi Trùng lặp)
-
-            // Lưu ý: Trong ứng dụng thực tế,  cần mã hóa mật khẩu trước khi lưu.
+            // Step 6: persist new account (password should be hashed in production)
             _context.Accounts.Add(model);
             await _context.SaveChangesAsync();
 
-            // Chuyển hướng đến trang Đăng nhập sau khi thành công
+            // Redirect to login page after success
             return RedirectToAction("Index", "Login");
         }
     }
