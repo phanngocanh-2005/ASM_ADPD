@@ -4903,11 +4903,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "F:\\ASM_ADPD\\AuthApp\\AuthApp.csproj",
+      "projectUniqueName": "E:\\ASM_ADPD\\AuthApp\\AuthApp.csproj",
       "projectName": "AuthApp",
-      "projectPath": "F:\\ASM_ADPD\\AuthApp\\AuthApp.csproj",
+      "projectPath": "E:\\ASM_ADPD\\AuthApp\\AuthApp.csproj",
       "packagesPath": "C:\\Users\\OWNER\\.nuget\\packages\\",
-      "outputPath": "F:\\ASM_ADPD\\AuthApp\\obj\\",
+      "outputPath": "E:\\ASM_ADPD\\AuthApp\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

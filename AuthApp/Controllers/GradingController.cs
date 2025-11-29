@@ -6,6 +6,8 @@ using AuthApp.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using AuthApp.Models.ViewModels;
+using AuthApp.Models.ViewModels;
 
 namespace AuthApp.Controllers
 {
@@ -68,7 +70,7 @@ namespace AuthApp.Controllers
 
             // Lấy danh sách điểm hiện có
             var grades = await _context.AcademicRecords
-                .Where(ar => ar.CourseId == courseId && ar.TeacherId == teacherId)
+                .Where(ar => ar.CourseId == courseId && ar.GradedBy == teacherId)
                 .ToListAsync();
 
             var viewModel = new GradeStudentsViewModel
@@ -121,7 +123,7 @@ namespace AuthApp.Controllers
                 var existingRecord = await _context.AcademicRecords
                     .FirstOrDefaultAsync(ar => ar.StudentId == studentGrade.StudentId && 
                                              ar.CourseId == model.CourseId &&
-                                             ar.TeacherId == teacherId);
+                                             ar.GradedBy == teacherId);
 
                 if (studentGrade.Grade.HasValue)
                 {
@@ -140,7 +142,7 @@ namespace AuthApp.Controllers
                         {
                             StudentId = studentGrade.StudentId,
                             CourseId = model.CourseId,
-                            TeacherId = teacherId,
+                            GradedBy = teacherId,
                             Score = studentGrade.Grade.Value,
                             MaxScore = studentGrade.MaxScore,
                             Notes = studentGrade.Notes,

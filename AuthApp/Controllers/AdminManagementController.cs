@@ -787,16 +787,22 @@ namespace AuthApp.Controllers
                 .Include(t => t.AcademicProgram)
                 .Include(t => t.CourseAssignments)
                     .ThenInclude(ca => ca.Course)
-                .Include(t => t.AcademicRecords)
-                    .ThenInclude(ar => ar.Course)
-                .Include(t => t.AcademicRecords)
-                    .ThenInclude(ar => ar.Student)
                 .FirstOrDefaultAsync(t => t.Id == id);
 
             if (teacher == null)
             {
                 return NotFound();
             }
+
+            // Load academic records where this teacher is the grader
+            teacher.AcademicRecords = await _context.AcademicRecords
+                .Where(ar => ar.GradedBy == id)
+                .Include(ar => ar.Course)
+                .Include(ar => ar.Student)
+                .ToListAsync();
+
+            // Add teacher ID to ViewData for use in the view if needed
+            ViewData["TeacherId"] = id;
 
             return View(teacher);
         }

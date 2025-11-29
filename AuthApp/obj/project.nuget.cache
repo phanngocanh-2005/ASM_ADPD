@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "G7xxU7XXxgc=",
+  "dgSpecHash": "sHrpVyi8Bcw=",
   "success": true,
-  "projectFilePath": "F:\\ASM_ADPD\\AuthApp\\AuthApp.csproj",
+  "projectFilePath": "E:\\ASM_ADPD\\AuthApp\\AuthApp.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\OWNER\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\OWNER\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -38,16 +39,21 @@ namespace AuthApp.Models
         [StringLength(500)]
         public string? Notes { get; set; }
 
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public DateTime? UpdatedAt { get; set; }
 
+        // Navigation properties with ForeignKey attributes
+        [ForeignKey("StudentId")]
         public Student Student { get; set; } = null!;
 
+        [ForeignKey("CourseId")]
         public Course Course { get; set; } = null!;
 
+        [ForeignKey("EnrollmentId")]
         public Enrollment? Enrollment { get; set; }
 
+        [ForeignKey("GradedBy")]
         public Teacher? Teacher { get; set; }
     }
 }
