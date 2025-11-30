@@ -32,6 +32,70 @@ namespace AuthApp.Controllers
             return View(programs);
         }
 
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> SeedDefaultCourses()
+        {
+            try
+            {
+                // Get or create a default academic program
+                var program = await _context.AcademicPrograms
+                    .Where(p => p.Status == "Active")
+                    .FirstOrDefaultAsync();
+
+                if (program == null)
+                {
+                    // Create default program
+                    program = new AcademicProgram
+                    {
+                        ProgramCode = "COMP",
+                        ProgramName = "Computing Program",
+                        Description = "Default Computing Program",
+                        Status = "Active",
+                        CreatedAt = DateTime.UtcNow
+                    };
+                    _context.AcademicPrograms.Add(program);
+                    await _context.SaveChangesAsync();
+                }
+
+                var courses = new List<Course>
+                {
+                    new Course { CourseCode = "PRO001", CourseName = "Professional Practice", Description = "Professional Practice course covering industry standards and professional ethics", AcademicProgramId = program.Id, Credits = 3, Status = "Active", CreatedAt = DateTime.UtcNow },
+                    new Course { CourseCode = "PCP001", CourseName = "Planning a Computing Project", Description = "Course on project planning methodologies and tools for computing projects", AcademicProgramId = program.Id, Credits = 3, Status = "Active", CreatedAt = DateTime.UtcNow },
+                    new Course { CourseCode = "DDD001", CourseName = "Database Design & Development", Description = "Comprehensive course on database design principles and development practices", AcademicProgramId = program.Id, Credits = 4, Status = "Active", CreatedAt = DateTime.UtcNow },
+                    new Course { CourseCode = "DSA001", CourseName = "Data Structures & Algorithms", Description = "Study of fundamental data structures and algorithm design and analysis", AcademicProgramId = program.Id, Credits = 4, Status = "Active", CreatedAt = DateTime.UtcNow },
+                    new Course { CourseCode = "IOT001", CourseName = "Internet of Things", Description = "Introduction to IoT concepts, devices, and applications", AcademicProgramId = program.Id, Credits = 3, Status = "Active", CreatedAt = DateTime.UtcNow },
+                    new Course { CourseCode = "SEC001", CourseName = "Security", Description = "Cybersecurity fundamentals, threats, and protection mechanisms", AcademicProgramId = program.Id, Credits = 3, Status = "Active", CreatedAt = DateTime.UtcNow },
+                    new Course { CourseCode = "SDLC001", CourseName = "Software Development Life Cycle", Description = "Comprehensive study of SDLC methodologies and best practices", AcademicProgramId = program.Id, Credits = 3, Status = "Active", CreatedAt = DateTime.UtcNow },
+                    new Course { CourseCode = "WDD001", CourseName = "Website Design & Development", Description = "Web development technologies, design principles, and modern frameworks", AcademicProgramId = program.Id, Credits = 4, Status = "Active", CreatedAt = DateTime.UtcNow },
+                    new Course { CourseCode = "BPS001", CourseName = "Business Process Support", Description = "Understanding and supporting business processes through technology", AcademicProgramId = program.Id, Credits = 3, Status = "Active", CreatedAt = DateTime.UtcNow },
+                    new Course { CourseCode = "APD001", CourseName = "Applied Programming and Design Principles", Description = "Practical programming skills and software design principles", AcademicProgramId = program.Id, Credits = 4, Status = "Active", CreatedAt = DateTime.UtcNow },
+                    new Course { CourseCode = "APP001", CourseName = "Application Development", Description = "Development of desktop and mobile applications using modern technologies", AcademicProgramId = program.Id, Credits = 4, Status = "Active", CreatedAt = DateTime.UtcNow },
+                    new Course { CourseCode = "DM001", CourseName = "Discrete Maths", Description = "Mathematical foundations for computer science including logic, sets, and graph theory", AcademicProgramId = program.Id, Credits = 3, Status = "Active", CreatedAt = DateTime.UtcNow }
+                };
+
+                int addedCount = 0;
+                foreach (var course in courses)
+                {
+                    var exists = await _context.Courses.AnyAsync(c => c.CourseCode == course.CourseCode);
+                    if (!exists)
+                    {
+                        _context.Courses.Add(course);
+                        addedCount++;
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = $"Successfully added {addedCount} new courses. {courses.Count - addedCount} courses already existed.";
+                return RedirectToAction("Programs");
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"An error occurred: {ex.Message}";
+                return RedirectToAction("Programs");
+            }
+        }
+
         [HttpGet]
         public IActionResult CreateProgram()
         {
@@ -599,7 +663,10 @@ namespace AuthApp.Controllers
                 // Get the newly created teacher ID
                 var newTeacherId = model.Id;
                 
-                TempData["SuccessMessage"] = $"Teacher {model.FullName} was created successfully.";
+                TempData["SuccessMessage"] = $"Teacher {model.FullName} was created successfully. " +
+                    $"Next steps: 1) Assign courses to this teacher via Course Assignment, " +
+                    $"2) Create schedules for the assigned courses. " +
+                    $"The teacher will automatically see their schedule and be able to manage grades once courses are assigned.";
                 return RedirectToAction(nameof(TeacherProfile), new { id = newTeacherId });
             }
             catch (DbUpdateException ex)

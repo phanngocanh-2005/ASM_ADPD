@@ -1,38 +1,8 @@
-﻿@model TeacherDashboardViewModel
-
-@{
-    ViewData["Title"] = "Teacher Dashboard";
+﻿@{
+    ViewData["Title"] = "Teacher Home";
 }
 
 <div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="text-primary mb-1">
-                <i class="fas fa-chalkboard-teacher"></i> Welcome back, @Model.Teacher.FullName
-            </h2>
-            <p class="mb-0 text-muted">
-                @if (Model.Teacher.AcademicProgram != null)
-                {
-                    <span>@Model.Teacher.AcademicProgram.ProgramName</span>
-                    <span class="mx-2">•</span>
-                }
-                <span>Status: 
-                    <span class="badge @(Model.Teacher.Status == "Active" ? "bg-success" : "bg-secondary")">
-                        @Model.Teacher.Status
-                    </span>
-                </span>
-            </p>
-        </div>
-        <div>
-            <a asp-action="Profile" class="btn btn-outline-primary me-2">
-                <i class="fas fa-id-card"></i> View Profile
-            </a>
-            <a asp-action="EditProfile" class="btn btn-primary">
-                <i class="fas fa-edit"></i> Update Profile
-            </a>
-        </div>
-    </div>
-
     @if (TempData["SuccessMessage"] != null)
     {
         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -48,118 +18,77 @@
         </div>
     }
 
-    <div class="row g-3 mb-4">
-        <div class="col-md-3">
-            <div class="card shadow-sm h-100 border-success">
-                <div class="card-body text-center">
-                    <i class="fas fa-book fa-2x text-success mb-2"></i>
-                    <h6 class="text-muted">Assigned Courses</h6>
-                    <h3>@Model.TotalAssignments</h3>
-                    <small class="text-success">@Model.ActiveAssignments active</small>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card shadow-sm h-100 border-primary">
-                <div class="card-body text-center">
-                    <i class="fas fa-user-graduate fa-2x text-primary mb-2"></i>
-                    <h6 class="text-muted">Students Impacted</h6>
-                    <h3>@Model.UniqueStudents</h3>
-                    <small>Total unique students you've graded</small>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card shadow-sm h-100 border-info">
-                <div class="card-body text-center">
-                    <i class="fas fa-clipboard-list fa-2x text-info mb-2"></i>
-                    <h6 class="text-muted">Grading Records</h6>
-                    <h3>@Model.TotalGradedRecords</h3>
-                    <small>Recorded assignments</small>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card shadow-sm h-100 border-warning">
-                <div class="card-body text-center">
-                    <i class="fas fa-clock fa-2x text-warning mb-2"></i>
-                    <h6 class="text-muted">Last Updated</h6>
-                    <h6>@(Model.Teacher.UpdatedAt?.ToString("dd/MM/yyyy") ?? "Not available")</h6>
-                    <small>Profile maintained</small>
-                </div>
-            </div>
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="text-primary mb-4">
+                <i class="fas fa-chalkboard-teacher"></i> Teacher Dashboard
+            </h2>
         </div>
     </div>
 
     <div class="row g-4">
-        <div class="col-lg-6">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="fas fa-book-open"></i> Recent Assignments</h5>
-                    <span class="badge bg-light text-success">@Model.TotalAssignments total</span>
-                </div>
-                <div class="card-body">
-                    @if (Model.RecentAssignments.Any())
-                    {
-                        <div class="list-group list-group-flush">
-                            @foreach (var assignment in Model.RecentAssignments)
-                            {
-                                <div class="list-group-item d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <strong>@assignment.Course?.CourseCode</strong>
-                                        <div class="text-muted small">@assignment.Course?.CourseName</div>
-                                        <div class="text-muted small">Assigned: @assignment.AssignmentDate.ToString("dd/MM/yyyy")</div>
-                                    </div>
-                                    <span class="badge @(assignment.Status == "Active" ? "bg-primary" : assignment.Status == "Completed" ? "bg-success" : "bg-secondary")">
-                                        @assignment.Status
-                                    </span>
-                                </div>
-                            }
-                        </div>
-                    }
-                    else
-                    {
-                        <p class="text-muted mb-0">No course assignments yet.</p>
-                    }
+        <!-- Teacher Profile Card -->
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100 border-primary" style="transition: transform 0.2s; cursor: pointer;" 
+                 onmouseover="this.style.transform='scale(1.05)'"
+                 onmouseout="this.style.transform='scale(1)'">
+                <div class="card-body text-center p-5">
+                    <div class="mb-4">
+                        <i class="fas fa-user-circle fa-4x text-primary"></i>
+                    </div>
+                    <h4 class="card-title text-primary mb-3">Teacher Profile</h4>
+                    <p class="card-text text-muted">
+                        View and manage your personal information and profile details.
+                    </p>
+                    <a asp-controller="TeacherHome" asp-action="Profile" class="btn btn-primary mt-3">
+                        <i class="fas fa-arrow-right"></i> View Profile
+                    </a>
                 </div>
             </div>
         </div>
-        <div class="col-lg-6">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="fas fa-chart-line"></i> Recent Grades</h5>
-                    <span class="badge bg-light text-info">@Model.TotalGradedRecords total</span>
+
+        <!-- Schedule Card -->
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100 border-success" style="transition: transform 0.2s; cursor: pointer;"
+                 onmouseover="this.style.transform='scale(1.05)'"
+                 onmouseout="this.style.transform='scale(1)'">
+                <div class="card-body text-center p-5">
+                    <div class="mb-4">
+                        <i class="fas fa-calendar-alt fa-4x text-success"></i>
+                    </div>
+                    <h4 class="card-title text-success mb-3">Schedule</h4>
+                    <p class="card-text text-muted">
+                        View your weekly teaching schedule with class times and room assignments.
+                    </p>
+                    <a asp-controller="TeacherHome" asp-action="Schedule" class="btn btn-success mt-3">
+                        <i class="fas fa-arrow-right"></i> View Schedule
+                    </a>
                 </div>
-                <div class="card-body">
-                    @if (Model.RecentGrades.Any())
-                    {
-                        <div class="list-group list-group-flush">
-                            @foreach (var record in Model.RecentGrades)
-                            {
-                                <div class="list-group-item">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <strong>@record.Course?.CourseCode</strong>
-                                            <span class="text-muted">(@record.AssignmentType)</span>
-                                        </div>
-                                        <div class="text-end">
-                                            <span class="fw-bold">@record.Score.ToString("0.##") / @record.MaxScore.ToString("0.##")</span>
-                                        </div>
-                                    </div>
-                                    <div class="text-muted small d-flex justify-content-between">
-                                        <span>Student: @record.Student?.FullName ?? "Unknown"</span>
-                                        <span>@(record.GradedDate?.ToString("dd/MM/yyyy") ?? "Pending")</span>
-                                    </div>
-                                </div>
-                            }
-                        </div>
-                    }
-                    else
-                    {
-                        <p class="text-muted mb-0">No grading records yet.</p>
-                    }
+            </div>
+        </div>
+
+        <!-- Grade Management Card -->
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100 border-warning" style="transition: transform 0.2s; cursor: pointer;"
+                 onmouseover="this.style.transform='scale(1.05)'"
+                 onmouseout="this.style.transform='scale(1)'">
+                <div class="card-body text-center p-5">
+                    <div class="mb-4">
+                        <i class="fas fa-graduation-cap fa-4x text-warning"></i>
+                    </div>
+                    <h4 class="card-title text-warning mb-3">Grade Management</h4>
+                    <p class="card-text text-muted">
+                        Manage student grades by course and assignment type. Add, edit, or delete grades.
+                    </p>
+                    <a asp-controller="Grading" asp-action="Index" class="btn btn-warning mt-3">
+                        <i class="fas fa-arrow-right"></i> Manage Grades
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

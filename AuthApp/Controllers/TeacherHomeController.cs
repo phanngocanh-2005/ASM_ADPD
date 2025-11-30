@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using AuthApp.Data;
 using AuthApp.Models;
 using AuthApp.Models.ViewModels;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -23,34 +25,24 @@ namespace AuthApp.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var teacher = await LoadTeacherAsync(includeRelations: true);
-            if (teacher == null)
+            try
             {
-                return HandleMissingProfile();
+                var teacherId = await GetCurrentTeacherId();
+                if (teacherId == 0)
+                {
+                    TempData["ErrorMessage"] = "Teacher profile not found. Please contact the administrator to create your profile.";
+                    return View();
+                }
+
+                // Dashboard page - no data loading needed
+                return View();
             }
-
-            var dashboard = new TeacherDashboardViewModel
+            catch (Exception ex)
             {
-                Teacher = teacher,
-                TotalAssignments = teacher.CourseAssignments?.Count ?? 0,
-                ActiveAssignments = teacher.CourseAssignments?.Count(ca => ca.Status == "Active") ?? 0,
-                TotalGradedRecords = teacher.AcademicRecords?.Count ?? 0,
-                UniqueStudents = teacher.AcademicRecords?
-                    .Where(ar => ar.StudentId != 0)
-                    .Select(ar => ar.StudentId)
-                    .Distinct()
-                    .Count() ?? 0,
-                RecentAssignments = teacher.CourseAssignments?
-                    .OrderByDescending(ca => ca.AssignmentDate)
-                    .Take(5)
-                    .ToList() ?? new List<CourseAssignment>(),
-                RecentGrades = teacher.AcademicRecords?
-                    .OrderByDescending(ar => ar.GradedDate ?? ar.CreatedAt)
-                    .Take(5)
-                    .ToList() ?? new List<AcademicRecord>()
-            };
-
-            return View(dashboard);
+                // Log the exception (you can add logging here)
+                TempData["ErrorMessage"] = "An error occurred while loading your page. Please try again.";
+                return View();
+            }
         }
 
         [HttpGet]
@@ -59,7 +51,8 @@ namespace AuthApp.Controllers
             var teacher = await LoadTeacherAsync(includeRelations: true);
             if (teacher == null)
             {
-                return HandleMissingProfile();
+                TempData["ErrorMessage"] = "Teacher profile not found. Please contact the administrator to create your profile.";
+                return RedirectToAction("Index", "TeacherHome");
             }
 
             return View(teacher);
@@ -71,7 +64,8 @@ namespace AuthApp.Controllers
             var teacher = await LoadTeacherAsync();
             if (teacher == null)
             {
-                return HandleMissingProfile();
+                TempData["ErrorMessage"] = "Teacher profile not found. Please contact the administrator to create your profile.";
+                return RedirectToAction("Index", "TeacherHome");
             }
 
             var viewModel = MapToEditViewModel(teacher);
@@ -96,7 +90,8 @@ namespace AuthApp.Controllers
 
             if (teacher == null)
             {
-                return HandleMissingProfile();
+                TempData["ErrorMessage"] = "Teacher profile not found. Please contact the administrator to create your profile.";
+                return RedirectToAction("Index", "TeacherHome");
             }
 
             teacher.FullName = model.FullName;
@@ -118,38 +113,103 @@ namespace AuthApp.Controllers
             return RedirectToAction(nameof(Profile));
         }
 
-        private async Task<Teacher?> LoadTeacherAsync(bool includeRelations = false)
+        [HttpGet]
+        public async Task<IActionResult> Schedule()
+        {
+            try
+            {
+                var teacherId = await GetCurrentTeacherId();
+                if (teacherId == 0)
+                {
+                    TempData["ErrorMessage"] = "Teacher profile not found. Please contact the administrator to create your profile.";
+                    return RedirectToAction("Index", "TeacherHome");
+                }
+
+                // Get all courses assigned to this teacher
+                var assignedCourseIds = await _context.CourseAssignments
+                    .Where(ca => ca.TeacherId == teacherId && ca.Status == "Active")
+                    .Select(ca => ca.CourseId)
+                    .ToListAsync();
+
+                // Get all schedules for assigned courses
+                var schedules = await _context.Schedules
+                    .Include(s => s.Course)
+                    .Where(s => assignedCourseIds.Contains(s.CourseId) && s.Status == "Active")
+                    .OrderBy(s => s.DayOfWeek)
+                    .ThenBy(s => s.StartTime)
+                    .ToListAsync();
+
+                return View("Schedule", schedules);
+            }
+            catch (Microsoft.Data.SqlClient.SqlException ex) when (ex.Message.Contains("Invalid object name 'Schedules'"))
+            {
+                TempData["ErrorMessage"] = "The Schedules table does not exist in the database. Please contact the administrator to run the database setup script (CreateSchedulesTable.sql).";
+                return View("Schedule", new List<Schedule>());
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"An error occurred while loading your schedule: {ex.Message}";
+                return View("Schedule", new List<Schedule>());
+            }
+        }
+
+        private async Task<int> GetCurrentTeacherId()
         {
             var accountId = GetCurrentAccountId();
             if (accountId == 0)
             {
+                return 0;
+            }
+
+            var teacher = await _context.Teachers
+                .FirstOrDefaultAsync(t => t.AccountId == accountId);
+
+            return teacher?.Id ?? 0;
+        }
+
+        private async Task<Teacher?> LoadTeacherAsync(bool includeRelations = false)
+        {
+            try
+            {
+                var accountId = GetCurrentAccountId();
+                if (accountId == 0)
+                {
+                    return null;
+                }
+
+                IQueryable<Teacher> query = _context.Teachers;
+
+                if (includeRelations)
+                {
+                    query = query
+                        .Include(t => t.Account)
+                        .Include(t => t.AcademicProgram)
+                        .Include(t => t.CourseAssignments).ThenInclude(ca => ca.Course)
+                        .Include(t => t.AcademicRecords).ThenInclude(ar => ar.Course)
+                        .Include(t => t.AcademicRecords).ThenInclude(ar => ar.Student);
+                }
+                else
+                {
+                    query = query
+                        .Include(t => t.Account)
+                        .Include(t => t.AcademicProgram);
+                }
+
+                return await query.FirstOrDefaultAsync(t => t.AccountId == accountId);
+            }
+            catch (Exception)
+            {
+                // Return null if there's an error loading teacher
+                // The calling method will handle the null case
                 return null;
             }
-
-            IQueryable<Teacher> query = _context.Teachers;
-
-            if (includeRelations)
-            {
-                query = query
-                    .Include(t => t.Account)
-                    .Include(t => t.AcademicProgram)
-                    .Include(t => t.CourseAssignments).ThenInclude(ca => ca.Course)
-                    .Include(t => t.AcademicRecords).ThenInclude(ar => ar.Course)
-                    .Include(t => t.AcademicRecords).ThenInclude(ar => ar.Student);
-            }
-            else
-            {
-                query = query
-                    .Include(t => t.Account)
-                    .Include(t => t.AcademicProgram);
-            }
-
-            return await query.FirstOrDefaultAsync(t => t.AccountId == accountId);
         }
 
         private IActionResult HandleMissingProfile()
         {
-            TempData["ErrorMessage"] = "Teacher profile not found. Please contact the administrator.";
+            // Set error message and redirect to Home
+            // HomeController will check for error message and not redirect back
+            TempData["ErrorMessage"] = "Teacher profile not found. Please contact the administrator to create your profile.";
             return RedirectToAction("Index", "Home");
         }
 

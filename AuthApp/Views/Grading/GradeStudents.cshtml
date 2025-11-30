@@ -1,25 +1,31 @@
 @model AuthApp.Models.ViewModels.GradeStudentsViewModel
 
 @{
-    ViewData["Title"] = "Nhập điểm môn học: " + Model.CourseName;
+    ViewData["Title"] = "Manage Grades: " + Model.CourseName;
 }
 
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>@ViewData["Title"]</h2>
         <a asp-action="Index" class="btn btn-outline-secondary">
-            <i class="fas fa-arrow-left"></i> Quay lại
+            <i class="fas fa-arrow-left"></i> Back to Courses
         </a>
     </div>
 
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
     }
 
     @if (TempData["ErrorMessage"] != null)
     {
-        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
     }
 
     <div class="card shadow-sm">
@@ -28,14 +34,35 @@
                 <input type="hidden" asp-for="CourseId" />
                 <input type="hidden" asp-for="CourseName" />
 
+                <!-- Assignment Type Selection -->
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Select Assignment Type:</label>
+                    <select name="AssignmentType" class="form-select" id="assignmentTypeSelect">
+                        @{
+                            var assignmentTypes = ViewBag.AssignmentTypes as List<string> ?? new List<string> { "Midterm", "Final", "Assignment", "Quiz", "Project" };
+                            var selectedType = ViewBag.SelectedAssignmentType as string ?? "Final";
+                        }
+                        @foreach (var type in assignmentTypes)
+                        {
+                            <option value="@type" selected="@(type == selectedType)">@type</option>
+                        }
+                    </select>
+                    <small class="text-muted">Select the type of assignment you want to grade or edit.</small>
+                </div>
+
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> You are currently managing grades for: <strong>@selectedType</strong> in <strong>@Model.CourseName</strong>
+                </div>
+
                 <div class="table-responsive">
                     <table class="table table-hover">
                         <thead class="table-light">
                             <tr>
-                                <th>Mã SV</th>
-                                <th>Họ và tên</th>
-                                <th style="width: 150px;">Điểm (0-100)</th>
-                                <th>Ghi chú</th>
+                                <th>Student Code</th>
+                                <th>Student Name</th>
+                                <th style="width: 200px;">Score (0-100)</th>
+                                <th>Notes</th>
+                                <th style="width: 120px;">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -56,15 +83,30 @@
                                             <input type="number" class="form-control" 
                                                    asp-for="Students[i].Grade" 
                                                    value="@(student.Grade ?? student.ExistingGrade)"
-                                                   min="0" max="100" step="0.01" />
+                                                   min="0" max="@student.MaxScore" step="0.01" 
+                                                   placeholder="@(student.ExistingGrade?.ToString("0.00") ?? "Enter score")" />
                                             <span class="input-group-text">/ @student.MaxScore</span>
                                         </div>
+                                        @if (student.ExistingGrade.HasValue)
+                                        {
+                                            <small class="text-muted">Current: @student.ExistingGrade.Value.ToString("0.00")</small>
+                                        }
                                         <span asp-validation-for="Students[i].Grade" class="text-danger"></span>
                                     </td>
                                     <td>
                                         <input type="text" class="form-control" 
                                                asp-for="Students[i].Notes" 
-                                               value="@student.Notes" />
+                                               value="@student.Notes" 
+                                               placeholder="Optional notes" />
+                                    </td>
+                                    <td>
+                                        @if (student.ExistingGrade.HasValue)
+                                        {
+                                            <button type="button" class="btn btn-sm btn-danger" 
+                                                    onclick="deleteGrade(@student.StudentId, '@selectedType', @Model.CourseId)">
+                                                <i class="fas fa-trash"></i> Delete
+                                            </button>
+                                        }
                                     </td>
                                 </tr>
                             }
@@ -72,9 +114,12 @@
                     </table>
                 </div>
 
-                <div class="d-flex justify-content-end mt-4">
+                <div class="d-flex justify-content-between mt-4">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Courses
+                    </a>
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Lưu điểm
+                        <i class="fas fa-save"></i> Save Grades for @selectedType
                     </button>
                 </div>
             </form>
@@ -85,14 +130,62 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script>
-        // Tự động chuyển sang ô nhập liệu tiếp theo khi nhập đủ 2 chữ số
+        // Auto-submit form when assignment type changes
+        document.getElementById('assignmentTypeSelect').addEventListener('change', function() {
+            var courseId = '@Model.CourseId';
+            var assignmentType = this.value;
+            window.location.href = '@Url.Action("GradeStudents", "Grading")?courseId=' + courseId + '&assignmentType=' + encodeURIComponent(assignmentType);
+        });
+
+        // Highlight rows with existing grades
         $(document).ready(function() {
-            $('input[type="number"]').on('input', function() {
-                var value = $(this).val();
-                if (value.length >= 2 && value <= 10) {
-                    $(this).next('input').focus();
+            $('input[type="number"]').each(function() {
+                if ($(this).attr('placeholder') && $(this).attr('placeholder') !== 'Enter score') {
+                    $(this).closest('tr').addClass('table-warning');
                 }
             });
         });
+
+        // Delete grade function
+        function deleteGrade(studentId, assignmentType, courseId) {
+            if (confirm('Are you sure you want to delete this grade?')) {
+                // Create a form to submit delete request
+                var form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '@Url.Action("DeleteGrade", "Grading")';
+                
+                // Add anti-forgery token
+                var token = document.querySelector('input[name="__RequestVerificationToken"]');
+                if (token) {
+                    var tokenInput = document.createElement('input');
+                    tokenInput.type = 'hidden';
+                    tokenInput.name = '__RequestVerificationToken';
+                    tokenInput.value = token.value;
+                    form.appendChild(tokenInput);
+                }
+
+                // Add parameters
+                var studentIdInput = document.createElement('input');
+                studentIdInput.type = 'hidden';
+                studentIdInput.name = 'studentId';
+                studentIdInput.value = studentId;
+                form.appendChild(studentIdInput);
+
+                var assignmentTypeInput = document.createElement('input');
+                assignmentTypeInput.type = 'hidden';
+                assignmentTypeInput.name = 'assignmentType';
+                assignmentTypeInput.value = assignmentType;
+                form.appendChild(assignmentTypeInput);
+
+                var courseIdInput = document.createElement('input');
+                courseIdInput.type = 'hidden';
+                courseIdInput.name = 'courseId';
+                courseIdInput.value = courseId;
+                form.appendChild(courseIdInput);
+
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
     </script>
 }

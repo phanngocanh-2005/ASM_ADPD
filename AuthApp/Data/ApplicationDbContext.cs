@@ -19,6 +19,7 @@ namespace AuthApp.Data
         public DbSet<Enrollment> Enrollments { get; set; }
         public DbSet<CourseAssignment> CourseAssignments { get; set; }
         public DbSet<AcademicRecord> AcademicRecords { get; set; }
+        public DbSet<Schedule> Schedules { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -177,6 +178,17 @@ namespace AuthApp.Data
                     .WithMany(t => t.AcademicRecords)
                     .HasForeignKey(x => x.GradedBy)
                     .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            modelBuilder.Entity<Schedule>(e =>
+            {
+                e.Property(x => x.Status).HasDefaultValue("Active");
+                e.Property(x => x.CreatedAt).HasDefaultValueSql("GETDATE()");
+
+                e.HasOne(x => x.Course)
+                    .WithMany(c => c.Schedules)
+                    .HasForeignKey(x => x.CourseId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             base.OnModelCreating(modelBuilder);

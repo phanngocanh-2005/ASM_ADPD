@@ -5,6 +5,7 @@
     var genderOptions = ViewBag.Genders as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>();
 }
 
+<!-- EDIT PROFILE PAGE - DO NOT REMOVE THIS COMMENT -->
 <div class="container mt-4">
     <h2 class="mb-4 text-primary">
         <i class="fas fa-edit"></i> Edit My Profile
@@ -13,7 +14,17 @@
 
     @if (TempData["ErrorMessage"] != null)
     {
-        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["InfoMessage"] != null)
+    {
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            @TempData["InfoMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
     }
 
     <div class="row">

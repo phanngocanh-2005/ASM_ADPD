@@ -1,9 +1,11 @@
 ﻿using AuthApp.Data;
 using AuthApp.Models;
+using AuthApp.Models.ViewModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Security.Claims;
 
 namespace AuthApp.Controllers
@@ -20,7 +22,7 @@ namespace AuthApp.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            return View("Index");
         }
 
         [HttpGet]
@@ -31,12 +33,6 @@ namespace AuthApp.Controllers
             var student = await _context.Students
                 .Include(s => s.Account)
                 .Include(s => s.AcademicProgram)
-                .Include(s => s.Enrollments)
-                    .ThenInclude(e => e.Course)
-                .Include(s => s.AcademicRecords)
-                    .ThenInclude(ar => ar.Course)
-                .Include(s => s.AcademicRecords)
-                    .ThenInclude(ar => ar.Teacher)
                 .FirstOrDefaultAsync(s => s.AccountId == accountId);
 
             if (student == null)
@@ -47,7 +43,7 @@ namespace AuthApp.Controllers
                 return RedirectToAction(nameof(CreateProfile));
             }
 
-            return View(student);
+            return View("Profile", student);
         }
 
         [HttpGet]
@@ -59,10 +55,6 @@ namespace AuthApp.Controllers
                 .Include(s => s.AcademicProgram)
                 .Include(s => s.Enrollments)
                     .ThenInclude(e => e.Course)
-                .Include(s => s.AcademicRecords)
-                    .ThenInclude(ar => ar.Course)
-                .Include(s => s.AcademicRecords)
-                    .ThenInclude(ar => ar.Teacher)
                 .FirstOrDefaultAsync(s => s.AccountId == accountId);
 
             if (student == null)
@@ -71,7 +63,8 @@ namespace AuthApp.Controllers
                 return RedirectToAction(nameof(CreateProfile));
             }
 
-            return View(student);
+            // Explicitly return Courses view
+            return View("Courses", student);
         }
 
         [HttpGet]
@@ -84,8 +77,9 @@ namespace AuthApp.Controllers
 
             if (existingStudent != null)
             {
-                // Profile already exists, go back to profile page
-                return RedirectToAction(nameof(Profile));
+                // Profile already exists, redirect to edit profile instead
+                TempData["InfoMessage"] = "You already have a profile. You can edit it here.";
+                return RedirectToAction(nameof(EditProfile));
             }
 
             await PopulateStudentLookups();
@@ -98,7 +92,7 @@ namespace AuthApp.Controllers
                 DateOfBirth = DateTime.UtcNow.AddYears(-18)
             };
 
-            return View(model);
+            return View("CreateProfile", model);
         }
 
         [HttpPost]
@@ -113,7 +107,7 @@ namespace AuthApp.Controllers
             if (!ModelState.IsValid)
             {
                 await PopulateStudentLookups();
-                return View(model);
+                return View("CreateProfile", model);
             }
 
             if (!model.AcademicProgramId.HasValue || model.AcademicProgramId.Value <= 0)
@@ -140,7 +134,7 @@ namespace AuthApp.Controllers
                 ModelState.AddModelError(nameof(Student.StudentCode),
                     "Student Code already exists. Please use a different code.");
                 await PopulateStudentLookups();
-                return View(model);
+                return View("CreateProfile", model);
             }
 
             model.CreatedAt = DateTime.UtcNow;
@@ -169,7 +163,7 @@ namespace AuthApp.Controllers
             }
 
             await PopulateStudentLookups();
-            return View(student);
+            return View("EditProfile", student);
         }
 
         [HttpPost]
@@ -178,19 +172,34 @@ namespace AuthApp.Controllers
         {
             var accountId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
             
-            if (!ModelState.IsValid)
-            {
-                await PopulateStudentLookups();
-                return View(model);
-            }
-
             var student = await _context.Students
+                .Include(s => s.Account)
                 .FirstOrDefaultAsync(s => s.AccountId == accountId);
 
             if (student == null)
             {
                 TempData["ErrorMessage"] = "Student profile not found.";
                 return RedirectToAction("Profile");
+            }
+
+            // Remove validation for fields that shouldn't be changed
+            ModelState.Remove(nameof(Student.AccountId));
+            ModelState.Remove(nameof(Student.StudentCode));
+            ModelState.Remove(nameof(Student.AcademicProgramId));
+            ModelState.Remove(nameof(Student.EnrollmentDate));
+            ModelState.Remove(nameof(Student.Status));
+            ModelState.Remove(nameof(Student.GPA));
+            ModelState.Remove(nameof(Student.CreatedAt));
+
+            if (!ModelState.IsValid)
+            {
+                // Reload the student with all related data for the view
+                student = await _context.Students
+                    .Include(s => s.Account)
+                    .Include(s => s.AcademicProgram)
+                    .FirstOrDefaultAsync(s => s.AccountId == accountId);
+                await PopulateStudentLookups();
+                return View("EditProfile", student);
             }
 
             // Only allow editing certain fields (not AccountId, StudentCode, AcademicProgramId)
@@ -205,9 +214,18 @@ namespace AuthApp.Controllers
             if (student.AccountId.HasValue)
             {
                 var account = await _context.Accounts.FindAsync(student.AccountId.Value);
-                if (account != null && !string.IsNullOrEmpty(model.Account?.Email))
+                if (account != null)
                 {
-                    account.Email = model.Account.Email;
+                    // Get email from form if provided
+                    if (Request.Form.ContainsKey("Account.Email"))
+                    {
+                        var email = Request.Form["Account.Email"].ToString();
+                        if (!string.IsNullOrWhiteSpace(email))
+                        {
+                            account.Email = email;
+                            _context.Update(account);
+                        }
+                    }
                 }
             }
 
@@ -234,7 +252,7 @@ namespace AuthApp.Controllers
                 return RedirectToAction("Profile");
             }
 
-            return View(student);
+            return View("DeleteProfile", student);
         }
 
         [HttpPost, ActionName("DeleteProfile")]
@@ -265,6 +283,95 @@ namespace AuthApp.Controllers
             TempData["SuccessMessage"] = "Your profile has been deleted successfully.";
             await HttpContext.SignOutAsync();
             return RedirectToAction("Index", "Login");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Schedule()
+        {
+            try
+            {
+                var accountId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+
+                var student = await _context.Students
+                    .Include(s => s.Enrollments)
+                        .ThenInclude(e => e.Course)
+                    .FirstOrDefaultAsync(s => s.AccountId == accountId);
+
+                if (student == null)
+                {
+                    TempData["ErrorMessage"] = "Student profile not found. Please create your profile first.";
+                    return RedirectToAction(nameof(CreateProfile));
+                }
+
+                // Get all schedules for enrolled courses
+                var enrolledCourseIds = student.Enrollments
+                    .Where(e => e.Status == "Enrolled")
+                    .Select(e => e.CourseId)
+                    .ToList();
+
+                var schedules = await _context.Schedules
+                    .Include(s => s.Course)
+                    .Where(s => enrolledCourseIds.Contains(s.CourseId) && s.Status == "Active")
+                    .OrderBy(s => s.DayOfWeek)
+                    .ThenBy(s => s.StartTime)
+                    .ToListAsync();
+
+                // Explicitly return Schedule view with schedules data
+                return View("Schedule", schedules);
+            }
+            catch (Microsoft.Data.SqlClient.SqlException ex) when (ex.Message.Contains("Invalid object name 'Schedules'"))
+            {
+                TempData["ErrorMessage"] = "The Schedules table does not exist in the database. Please contact the administrator to run the database setup script (CreateSchedulesTable.sql).";
+                return View("Schedule", new List<Schedule>());
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"An error occurred while loading your schedule: {ex.Message}";
+                return View("Schedule", new List<Schedule>());
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Grades()
+        {
+            var accountId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+
+            var student = await _context.Students
+                .Include(s => s.Enrollments)
+                    .ThenInclude(e => e.Course)
+                .Include(s => s.AcademicRecords)
+                    .ThenInclude(ar => ar.Course)
+                .Include(s => s.AcademicRecords)
+                    .ThenInclude(ar => ar.Teacher)
+                .FirstOrDefaultAsync(s => s.AccountId == accountId);
+
+            if (student == null)
+            {
+                TempData["ErrorMessage"] = "Student profile not found. Please create your profile first.";
+                return RedirectToAction(nameof(CreateProfile));
+            }
+
+            // Group grades by course
+            var gradesByCourse = student.AcademicRecords
+                .GroupBy(ar => ar.Course)
+                .Select(g => new CourseGradesViewModel
+                {
+                    Course = g.Key!,
+                    Records = g.OrderByDescending(r => r.GradedDate ?? r.CreatedAt).ToList(),
+                    AverageScore = g.Average(r => r.Score),
+                    TotalRecords = g.Count()
+                })
+                .OrderBy(g => g.Course?.CourseCode)
+                .ToList();
+
+            var viewModel = new StudentGradesViewModel
+            {
+                Student = student,
+                GradesByCourse = gradesByCourse
+            };
+
+            // Explicitly return Grades view with grades data
+            return View("Grades", viewModel);
         }
 
         private async Task PopulateStudentLookups()

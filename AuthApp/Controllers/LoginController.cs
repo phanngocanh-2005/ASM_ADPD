@@ -39,8 +39,16 @@ namespace AuthApp.Controllers
         [AllowAnonymous]
         public IActionResult TeacherLogin(string returnUrl = null)
         {
+            // Check if user is already authenticated as Teacher
             if (User?.Identity?.IsAuthenticated == true && User.IsInRole("Teacher"))
             {
+                // Prevent redirect loop - if returnUrl is the login page itself, ignore it
+                if (!string.IsNullOrEmpty(returnUrl) && 
+                    !returnUrl.Contains("/Login/TeacherLogin") && 
+                    Url.IsLocalUrl(returnUrl))
+                {
+                    return Redirect(returnUrl);
+                }
                 return RedirectToAction("Index", "TeacherHome");
             }
             
@@ -93,10 +101,15 @@ namespace AuthApp.Controllers
 
             HttpContext.Session.SetString("Username", account.Username);
             
-            if (Url.IsLocalUrl(returnUrl))
+            // Prevent redirect loop - ensure returnUrl is not the login page itself
+            if (!string.IsNullOrEmpty(returnUrl) && 
+                Url.IsLocalUrl(returnUrl) && 
+                !returnUrl.Contains("/Login/TeacherLogin"))
             {
                 return Redirect(returnUrl);
             }
+            
+            // Redirect to TeacherHome after successful login
             return RedirectToAction("Index", "TeacherHome");
         }
 

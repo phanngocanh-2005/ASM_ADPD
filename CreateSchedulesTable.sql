@@ -1,0 +1,51 @@
+-- ============================================
+-- Script to Create Schedules Table
+-- This table stores class schedules/timetables
+-- ============================================
+
+IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Schedules')
+BEGIN
+    CREATE TABLE Schedules (
+        Id INT PRIMARY KEY IDENTITY(1,1),
+        CourseId INT NOT NULL,
+        DayOfWeek NVARCHAR(20) NOT NULL CHECK (DayOfWeek IN ('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')),
+        StartTime TIME NOT NULL,
+        EndTime TIME NOT NULL,
+        Room NVARCHAR(50) NULL,
+        Building NVARCHAR(100) NULL,
+        ClassType NVARCHAR(20) NULL CHECK (ClassType IN ('Lecture', 'Lab', 'Tutorial', 'Seminar', 'Workshop')),
+        Status NVARCHAR(20) NOT NULL DEFAULT 'Active' CHECK (Status IN ('Active', 'Inactive')),
+        CreatedAt DATETIME NOT NULL DEFAULT GETDATE(),
+        UpdatedAt DATETIME NULL,
+        CONSTRAINT FK_Schedules_Course FOREIGN KEY (CourseId) REFERENCES Courses(Id) ON DELETE CASCADE,
+        CONSTRAINT CK_Schedules_Time CHECK (EndTime > StartTime)
+    );
+    
+    PRINT 'Created table Schedules';
+END
+ELSE
+BEGIN
+    PRINT 'Table Schedules already exists';
+END
+GO
+
+-- Create index for better query performance
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_Schedules_CourseId')
+BEGIN
+    CREATE INDEX IX_Schedules_CourseId ON Schedules(CourseId);
+    PRINT 'Created index IX_Schedules_CourseId';
+END
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_Schedules_DayOfWeek')
+BEGIN
+    CREATE INDEX IX_Schedules_DayOfWeek ON Schedules(DayOfWeek);
+    PRINT 'Created index IX_Schedules_DayOfWeek';
+END
+GO
+
+PRINT '========================================';
+PRINT 'Schedules table setup completed!';
+PRINT '========================================';
+GO
+

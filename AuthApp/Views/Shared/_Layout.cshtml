@@ -22,7 +22,12 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Teacher"))
+                    @{
+                        var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+                        var isTeacherHomePage = currentController == "TeacherHome" || currentController == "Grading" || currentController == "Schedule" || currentController == "CourseAssignment" || currentController == "Task";
+                        var isPublicPage = currentController == "Home" || currentController == "Login" || currentController == "Register";
+                    }
+                    @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Teacher") && isTeacherHomePage)
                     {
                         @await Html.PartialAsync("_TeacherNavigation")
                     }
@@ -38,7 +43,7 @@
                         </ul>
                     }
                     <ul class="navbar-nav">
-                        @if (User?.Identity?.IsAuthenticated == true)
+                        @if (User?.Identity?.IsAuthenticated == true && !isPublicPage)
                         {
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle text-dark" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">

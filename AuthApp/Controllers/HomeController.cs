@@ -18,7 +18,8 @@ namespace AuthApp.Controllers
         public IActionResult Index()
         {
             // Nếu đã đăng nhập, redirect đến dashboard tương ứng
-            if (User?.Identity?.IsAuthenticated == true)
+            // Nhưng chỉ redirect nếu không có error message (tránh redirect loop)
+            if (User?.Identity?.IsAuthenticated == true && TempData["ErrorMessage"] == null)
             {
                 if (User.IsInRole("Admin"))
                 {

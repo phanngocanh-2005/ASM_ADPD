@@ -62,23 +62,12 @@
     <img src="~/Figure/Btec.png" alt="BTEC" style="width: 200px; margin-top: 10px;">
 
     <div class="main-card">
+        <h1 class="main-title">Student Information Management System </h1>
 
-        @if (ViewBag.Username == null)
-        {
-            <h1 class="main-title">Student Information Management System </h1>
-
-            <div style="margin-top: 30px;">
-                <a href="@Url.Action("Index", "Register")" class="btn-btec-primary"> Register Now </a>
-                <a href="@Url.Action("Index", "Login")" class="btn-btec-primary"> Login </a>
-            </div>
-        }
-        else
-        {
-            <h1 class="main-title">
-                Welcome @ViewBag.Username
-            </h1>
-            <a href="@Url.Action("Index", "Task")" class="btn-btec-primary"> View tasks</a>
-        }
+        <div style="margin-top: 30px;">
+            <a href="@Url.Action("Index", "Register")" class="btn-btec-primary"> Register Now </a>
+            <a href="@Url.Action("Index", "Login")" class="btn-btec-primary"> Login </a>
+        </div>
 
         @if (@ViewBag.isConnected)
         {

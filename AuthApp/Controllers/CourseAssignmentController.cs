@@ -19,26 +19,33 @@ namespace AuthApp.Controllers
             _context = context;
         }
 
-        // Hiển thị danh sách phân công
+        // Display list of course assignments
         public async Task<IActionResult> Index()
         {
             var assignments = await _context.CourseAssignments
                 .Include(ca => ca.Teacher)
                 .Include(ca => ca.Course)
+                .OrderByDescending(ca => ca.AssignmentDate)
                 .ToListAsync();
                 
             return View(assignments);
         }
 
-        // Hiển thị form tạo mới phân công
+        // Display form to create new assignment
         public async Task<IActionResult> Create()
         {
-            ViewBag.Teachers = await _context.Teachers.ToListAsync();
-            ViewBag.Courses = await _context.Courses.ToListAsync();
+            ViewBag.Teachers = await _context.Teachers
+                .Where(t => t.Status == "Active")
+                .OrderBy(t => t.FullName)
+                .ToListAsync();
+            ViewBag.Courses = await _context.Courses
+                .Where(c => c.Status == "Active")
+                .OrderBy(c => c.CourseCode)
+                .ToListAsync();
             return View();
         }
 
-        // Xử lý tạo mới phân công
+        // Handle creating new assignment
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("TeacherId,CourseId,Status")] CourseAssignment assignment)
@@ -51,12 +58,20 @@ namespace AuthApp.Controllers
                 _context.Add(assignment);
                 await _context.SaveChangesAsync();
                 
-                TempData["SuccessMessage"] = "Đã phân công khóa học thành công!";
+                TempData["SuccessMessage"] = "Course assigned successfully! " +
+                    "The teacher can now view this course in Grade Management. " +
+                    "Remember to create a schedule for this course so the teacher can see it in their weekly schedule.";
                 return RedirectToAction(nameof(Index));
             }
             
-            ViewBag.Teachers = await _context.Teachers.ToListAsync();
-            ViewBag.Courses = await _context.Courses.ToListAsync();
+            ViewBag.Teachers = await _context.Teachers
+                .Where(t => t.Status == "Active")
+                .OrderBy(t => t.FullName)
+                .ToListAsync();
+            ViewBag.Courses = await _context.Courses
+                .Where(c => c.Status == "Active")
+                .OrderBy(c => c.CourseCode)
+                .ToListAsync();
             return View(assignment);
         }
     }

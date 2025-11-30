@@ -1,0 +1,190 @@
+@model IEnumerable<AuthApp.Models.Schedule>
+
+@{
+    ViewData["Title"] = "My Schedule";
+}
+
+<!-- SCHEDULE PAGE - DO NOT REMOVE THIS COMMENT -->
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary">
+            <i class="fas fa-calendar-alt"></i> My Class Schedule
+        </h2>
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (Model != null && Model.Any())
+    {
+        <!-- Weekly Schedule Table -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-calendar-week"></i> Weekly Class Schedule</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 12%;">Time</th>
+                                <th style="width: 12%;">Monday</th>
+                                <th style="width: 12%;">Tuesday</th>
+                                <th style="width: 12%;">Wednesday</th>
+                                <th style="width: 12%;">Thursday</th>
+                                <th style="width: 12%;">Friday</th>
+                                <th style="width: 12%;">Saturday</th>
+                                <th style="width: 12%;">Sunday</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                var daysOfWeek = new[] { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
+                                var timeSlots = Model
+                                    .Select(s => new { s.StartTime, s.EndTime })
+                                    .Distinct()
+                                    .OrderBy(t => t.StartTime)
+                                    .ToList();
+                            }
+                            @foreach (var timeSlot in timeSlots)
+                            {
+                                <tr>
+                                    <td class="fw-bold">
+                                        @timeSlot.StartTime.ToString(@"hh\:mm")<br />
+                                        <small class="text-muted">@timeSlot.EndTime.ToString(@"hh\:mm")</small>
+                                    </td>
+                                    @foreach (var day in daysOfWeek)
+                                    {
+                                        var schedule = Model.FirstOrDefault(s => 
+                                            s.DayOfWeek == day && 
+                                            s.StartTime == timeSlot.StartTime && 
+                                            s.EndTime == timeSlot.EndTime);
+                                        <td>
+                                            @if (schedule != null)
+                                            {
+                                                <div class="p-2 bg-light rounded">
+                                                    <strong class="text-primary">@schedule.Course?.CourseCode</strong>
+                                                    <br />
+                                                    <small>@schedule.Course?.CourseName</small>
+                                                    <br />
+                                                    @if (!string.IsNullOrEmpty(schedule.Room))
+                                                    {
+                                                        <small class="text-muted">
+                                                            <i class="fas fa-door-open"></i> @schedule.Room
+                                                        </small>
+                                                    }
+                                                    @if (!string.IsNullOrEmpty(schedule.Building))
+                                                    {
+                                                        <br />
+                                                        <small class="text-muted">
+                                                            <i class="fas fa-building"></i> @schedule.Building
+                                                        </small>
+                                                    }
+                                                    @if (!string.IsNullOrEmpty(schedule.ClassType))
+                                                    {
+                                                        <br />
+                                                        <span class="badge bg-info mt-1">@schedule.ClassType</span>
+                                                    }
+                                                </div>
+                                            }
+                                        </td>
+                                    }
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Schedule List -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-list"></i> Detailed Schedule List</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Day</th>
+                                <th>Time</th>
+                                <th>Course</th>
+                                <th>Room</th>
+                                <th>Building</th>
+                                <th>Class Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var day in daysOfWeek)
+                            {
+                                var daySchedules = Model.Where(s => s.DayOfWeek == day).OrderBy(s => s.StartTime).ToList();
+                                @if (daySchedules.Any())
+                                {
+                                    @foreach (var schedule in daySchedules)
+                                    {
+                                        <tr>
+                                            <td><strong>@day</strong></td>
+                                            <td>
+                                                @schedule.StartTime.ToString(@"hh\:mm") - @schedule.EndTime.ToString(@"hh\:mm")
+                                            </td>
+                                            <td>
+                                                <strong>@schedule.Course?.CourseCode</strong>
+                                                <br />
+                                                <small class="text-muted">@schedule.Course?.CourseName</small>
+                                            </td>
+                                            <td>@(schedule.Room ?? "-")</td>
+                                            <td>@(schedule.Building ?? "-")</td>
+                                            <td>
+                                                <span class="badge bg-info">@(schedule.ClassType ?? "N/A")</span>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Schedule Summary -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-chart-pie"></i> Schedule Summary</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <p><strong>Total Classes per Week:</strong> <span class="badge bg-primary">@Model.Count()</span></p>
+                    </div>
+                    <div class="col-md-4">
+                        <p><strong>Total Courses:</strong> <span class="badge bg-success">@Model.Select(s => s.CourseId).Distinct().Count()</span></p>
+                    </div>
+                    <div class="col-md-4">
+                        <p><strong>Days with Classes:</strong> <span class="badge bg-info">@Model.Select(s => s.DayOfWeek).Distinct().Count()</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> No schedule found. Please contact the administrator if you believe this is an error.
+        </div>
+    }
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+

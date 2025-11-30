@@ -4897,24 +4897,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\OWNER\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\lenovo\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\ASM_ADPD\\AuthApp\\AuthApp.csproj",
+      "projectUniqueName": "D:\\APDP\\ASM_ADPD - Copy (2)\\AuthApp\\AuthApp.csproj",
       "projectName": "AuthApp",
-      "projectPath": "E:\\ASM_ADPD\\AuthApp\\AuthApp.csproj",
-      "packagesPath": "C:\\Users\\OWNER\\.nuget\\packages\\",
-      "outputPath": "E:\\ASM_ADPD\\AuthApp\\obj\\",
+      "projectPath": "D:\\APDP\\ASM_ADPD - Copy (2)\\AuthApp\\AuthApp.csproj",
+      "packagesPath": "C:\\Users\\lenovo\\.nuget\\packages\\",
+      "outputPath": "D:\\APDP\\ASM_ADPD - Copy (2)\\AuthApp\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
-        "C:\\Users\\OWNER\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Users\\lenovo\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -4940,8 +4935,7 @@
         "enableAudit": "true",
         "auditLevel": "low",
         "auditMode": "direct"
-      },
-      "SdkAnalysisLevel": "9.0.300"
+      }
     },
     "frameworks": {
       "net8.0": {
@@ -4981,7 +4975,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.307/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.403/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

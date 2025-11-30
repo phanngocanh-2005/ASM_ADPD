@@ -1,0 +1,147 @@
+@model AuthApp.Models.Schedule
+
+@{
+    ViewData["Title"] = "Create Schedule";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary">
+            <i class="fas fa-plus-circle"></i> Create New Schedule
+        </h2>
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form asp-action="Create" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="CourseId" class="form-label fw-bold">Course <span class="text-danger">*</span></label>
+                        <select asp-for="CourseId" class="form-select" asp-items="ViewBag.Courses" required>
+                            <option value="">-- Select Course --</option>
+                        </select>
+                        <span asp-validation-for="CourseId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="DayOfWeek" class="form-label fw-bold">Day of Week <span class="text-danger">*</span></label>
+                        <select asp-for="DayOfWeek" class="form-select" asp-items="ViewBag.DayOfWeekOptions" required>
+                            <option value="">-- Select Day --</option>
+                        </select>
+                        <span asp-validation-for="DayOfWeek" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Time Slot <span class="text-danger">*</span></label>
+                        <select id="timeSlotSelect" class="form-select" required>
+                            <option value="">-- Select Time Slot --</option>
+                            <option value="07:00-07:10">07:00 - 07:10</option>
+                            <option value="07:10-07:20">07:10 - 07:20</option>
+                            <option value="07:20-07:30">07:20 - 07:30</option>
+                            <option value="07:30-07:40">07:30 - 07:40</option>
+                            <option value="07:40-07:50">07:40 - 07:50</option>
+                            <option value="07:50-08:00">07:50 - 08:00</option>
+                        </select>
+                        <small class="form-text text-muted">Select from predefined 10-minute time slots starting from 7:00 AM</small>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label asp-for="StartTime" class="form-label fw-bold">Start Time <span class="text-danger">*</span></label>
+                        <input asp-for="StartTime" type="time" class="form-control" id="startTime" step="600" required />
+                        <span asp-validation-for="StartTime" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label asp-for="EndTime" class="form-label fw-bold">End Time <span class="text-danger">*</span></label>
+                        <input asp-for="EndTime" type="time" class="form-control" id="endTime" step="600" required />
+                        <span asp-validation-for="EndTime" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Room" class="form-label fw-bold">Room</label>
+                        <input asp-for="Room" class="form-control" placeholder="e.g., D410, A101" />
+                        <span asp-validation-for="Room" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Building" class="form-label fw-bold">Building</label>
+                        <input asp-for="Building" class="form-control" placeholder="e.g., Main Building" />
+                        <span asp-validation-for="Building" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="ClassType" class="form-label fw-bold">Class Type</label>
+                        <select asp-for="ClassType" class="form-select" asp-items="ViewBag.ClassTypeOptions">
+                            <option value="">-- Select Type --</option>
+                        </select>
+                        <span asp-validation-for="ClassType" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Status" class="form-label fw-bold">Status <span class="text-danger">*</span></label>
+                        <select asp-for="Status" class="form-select" asp-items="ViewBag.StatusOptions" required></select>
+                        <span asp-validation-for="Status" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Create Schedule
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        // Auto-fill start and end time when time slot is selected
+        document.getElementById('timeSlotSelect').addEventListener('change', function() {
+            var selectedSlot = this.value;
+            if (selectedSlot) {
+                var times = selectedSlot.split('-');
+                if (times.length === 2) {
+                    document.getElementById('startTime').value = times[0].trim() + ':00';
+                    document.getElementById('endTime').value = times[1].trim() + ':00';
+                }
+            }
+        });
+
+        // Update time slot dropdown when manual time is entered
+        function updateTimeSlot() {
+            var startTime = document.getElementById('startTime').value;
+            var endTime = document.getElementById('endTime').value;
+            
+            if (startTime && endTime) {
+                var start = startTime.substring(0, 5); // Get HH:mm
+                var end = endTime.substring(0, 5);
+                var slotValue = start + '-' + end;
+                
+                var slotSelect = document.getElementById('timeSlotSelect');
+                var option = Array.from(slotSelect.options).find(opt => opt.value === slotValue);
+                if (option) {
+                    slotSelect.value = slotValue;
+                } else {
+                    slotSelect.value = '';
+                }
+            }
+        }
+
+        document.getElementById('startTime').addEventListener('change', updateTimeSlot);
+        document.getElementById('endTime').addEventListener('change', updateTimeSlot);
+    </script>
+}

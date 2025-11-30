@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AuthApp.Models.ViewModels;
-using AuthApp.Models.ViewModels;
 
 namespace AuthApp.Controllers
 {
@@ -21,7 +20,7 @@ namespace AuthApp.Controllers
             _context = context;
         }
 
-        // Hiển thị danh sách các khóa học đang dạy
+        // Display list of courses being taught
         public async Task<IActionResult> Index()
         {
             var teacherId = await GetCurrentTeacherId();
@@ -39,8 +38,8 @@ namespace AuthApp.Controllers
             return View(courses);
         }
 
-        // Hiển thị danh sách sinh viên trong một khóa học để nhập điểm
-        public async Task<IActionResult> GradeStudents(int courseId)
+        // Display list of students in a course for grading
+        public async Task<IActionResult> GradeStudents(int courseId, string? assignmentType = null)
         {
             var teacherId = await GetCurrentTeacherId();
             if (teacherId == 0)
@@ -48,13 +47,13 @@ namespace AuthApp.Controllers
                 return RedirectToAction("Index", "TeacherHome");
             }
 
-            // Kiểm tra xem giáo viên có được phân công dạy khóa học này không
+            // Check if teacher is assigned to teach this course
             var isAssigned = await _context.CourseAssignments
                 .AnyAsync(ca => ca.TeacherId == teacherId && ca.CourseId == courseId && ca.Status == "Active");
 
             if (!isAssigned)
             {
-                TempData["ErrorMessage"] = "Bạn không có quyền truy cập vào khóa học này.";
+                TempData["ErrorMessage"] = "You do not have permission to access this course.";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -68,76 +67,112 @@ namespace AuthApp.Controllers
                 return NotFound();
             }
 
-            // Lấy danh sách điểm hiện có
+            // Get all existing grades (all assignment types)
             var grades = await _context.AcademicRecords
                 .Where(ar => ar.CourseId == courseId && ar.GradedBy == teacherId)
                 .ToListAsync();
+
+            // Get all assignment types for this course
+            var assignmentTypes = grades.Select(g => g.AssignmentType).Distinct().ToList();
+            // Add default assignment types if none exist
+            var defaultTypes = new List<string> { "Midterm", "Final", "Assignment", "Quiz", "Project", "Lab", "Presentation" };
+            foreach (var type in defaultTypes)
+            {
+                if (!assignmentTypes.Contains(type))
+                {
+                    assignmentTypes.Add(type);
+                }
+            }
+            assignmentTypes = assignmentTypes.OrderBy(t => t).ToList();
+
+            ViewBag.AssignmentTypes = assignmentTypes;
+            ViewBag.SelectedAssignmentType = assignmentType ?? Request.Query["assignmentType"].ToString() ?? assignmentTypes.FirstOrDefault() ?? "Final";
 
             var viewModel = new GradeStudentsViewModel
             {
                 CourseId = courseId,
                 CourseName = course.CourseName,
-                Students = course.Enrollments.Select(e => new StudentGradeViewModel
+                Students = course.Enrollments.Select(e => 
                 {
-                    StudentId = e.StudentId,
-                    StudentName = e.Student.FullName,
-                    StudentCode = e.Student.StudentCode,
-                    ExistingGrade = grades.FirstOrDefault(g => g.StudentId == e.StudentId)?.Score,
-                    MaxScore = 100,
-                    Notes = grades.FirstOrDefault(g => g.StudentId == e.StudentId)?.Notes
+                    var selectedType = ViewBag.SelectedAssignmentType as string;
+                    var existingRecord = grades.FirstOrDefault(g => 
+                        g.StudentId == e.StudentId && 
+                        g.AssignmentType == selectedType);
+                    
+                    return new StudentGradeViewModel
+                    {
+                        StudentId = e.StudentId,
+                        StudentName = e.Student.FullName,
+                        StudentCode = e.Student.StudentCode,
+                        Grade = existingRecord?.Score,
+                        ExistingGrade = existingRecord?.Score,
+                        MaxScore = existingRecord?.MaxScore ?? 100,
+                        Notes = existingRecord?.Notes,
+                        AssignmentType = selectedType
+                    };
                 }).ToList()
             };
 
             return View(viewModel);
         }
 
-        // Xử lý việc lưu điểm
+        // Handle saving grades
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SaveGrades(GradeStudentsViewModel model)
         {
-            if (!ModelState.IsValid)
-            {
-                return View("GradeStudents", model);
-            }
-
             var teacherId = await GetCurrentTeacherId();
             if (teacherId == 0)
             {
                 return RedirectToAction("Index", "TeacherHome");
             }
 
-            // Kiểm tra xem giáo viên có được phân công dạy khóa học này không
+            // Get assignment type from form
+            var assignmentType = Request.Form["AssignmentType"].ToString();
+            if (string.IsNullOrEmpty(assignmentType))
+            {
+                assignmentType = "Final";
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return RedirectToAction(nameof(GradeStudents), new { courseId = model.CourseId, assignmentType = assignmentType });
+            }
+
+            // Check if teacher is assigned to teach this course
             var isAssigned = await _context.CourseAssignments
                 .AnyAsync(ca => ca.TeacherId == teacherId && ca.CourseId == model.CourseId && ca.Status == "Active");
 
             if (!isAssigned)
             {
-                TempData["ErrorMessage"] = "Bạn không có quyền cập nhật điểm cho khóa học này.";
+                TempData["ErrorMessage"] = "You do not have permission to update grades for this course.";
                 return RedirectToAction(nameof(Index));
             }
 
-            // Lưu điểm cho từng sinh viên
+            // Save grades for each student
             foreach (var studentGrade in model.Students)
             {
                 var existingRecord = await _context.AcademicRecords
                     .FirstOrDefaultAsync(ar => ar.StudentId == studentGrade.StudentId && 
                                              ar.CourseId == model.CourseId &&
-                                             ar.GradedBy == teacherId);
+                                             ar.GradedBy == teacherId &&
+                                             ar.AssignmentType == assignmentType);
 
                 if (studentGrade.Grade.HasValue)
                 {
                     if (existingRecord != null)
                     {
-                        // Cập nhật điểm hiện có
+                        // Update existing grade
                         existingRecord.Score = studentGrade.Grade.Value;
+                        existingRecord.MaxScore = studentGrade.MaxScore;
                         existingRecord.Notes = studentGrade.Notes;
+                        existingRecord.GradedDate = DateTime.Now;
                         existingRecord.UpdatedAt = DateTime.Now;
                         _context.Update(existingRecord);
                     }
                     else
                     {
-                        // Tạo bản ghi mới
+                        // Create new record
                         var record = new AcademicRecord
                         {
                             StudentId = studentGrade.StudentId,
@@ -146,7 +181,7 @@ namespace AuthApp.Controllers
                             Score = studentGrade.Grade.Value,
                             MaxScore = studentGrade.MaxScore,
                             Notes = studentGrade.Notes,
-                            AssignmentType = "Final",
+                            AssignmentType = assignmentType,
                             GradedDate = DateTime.Now,
                             CreatedAt = DateTime.Now
                         };
@@ -155,17 +190,60 @@ namespace AuthApp.Controllers
                 }
                 else if (existingRecord != null)
                 {
-                    // Xóa bản ghi nếu điểm là null
+                    // Delete record if grade is null
                     _context.AcademicRecords.Remove(existingRecord);
                 }
             }
 
             await _context.SaveChangesAsync();
-            TempData["SuccessMessage"] = "Đã lưu điểm thành công!";
-            return RedirectToAction(nameof(Index));
+            TempData["SuccessMessage"] = $"Grades for {assignmentType} have been saved successfully!";
+            return RedirectToAction(nameof(GradeStudents), new { courseId = model.CourseId, assignmentType = assignmentType });
         }
 
-        // Lấy ID của giáo viên đang đăng nhập
+        // Delete a specific grade
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteGrade(int studentId, string assignmentType, int courseId)
+        {
+            var teacherId = await GetCurrentTeacherId();
+            if (teacherId == 0)
+            {
+                TempData["ErrorMessage"] = "Unable to identify teacher. Please try again.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Check if teacher is assigned to teach this course
+            var isAssigned = await _context.CourseAssignments
+                .AnyAsync(ca => ca.TeacherId == teacherId && ca.CourseId == courseId && ca.Status == "Active");
+
+            if (!isAssigned)
+            {
+                TempData["ErrorMessage"] = "You do not have permission to delete grades for this course.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Find and delete the grade record
+            var record = await _context.AcademicRecords
+                .FirstOrDefaultAsync(ar => ar.StudentId == studentId && 
+                                         ar.CourseId == courseId &&
+                                         ar.GradedBy == teacherId &&
+                                         ar.AssignmentType == assignmentType);
+
+            if (record != null)
+            {
+                _context.AcademicRecords.Remove(record);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = $"Grade for {assignmentType} has been deleted successfully.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Grade record not found.";
+            }
+
+            return RedirectToAction(nameof(GradeStudents), new { courseId = courseId, assignmentType = assignmentType });
+        }
+
+        // Get ID of the currently logged-in teacher
         private async Task<int> GetCurrentTeacherId()
         {
             var accountId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0");

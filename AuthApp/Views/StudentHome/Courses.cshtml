@@ -4,6 +4,7 @@
     ViewData["Title"] = "My Courses";
 }
 
+<!-- COURSES PAGE - DO NOT REMOVE THIS COMMENT -->
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="text-primary">
@@ -29,126 +30,135 @@
         </div>
     }
 
-    <!-- Course Enrollments Section -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-header bg-success text-white">
-            <h5 class="mb-0"><i class="fas fa-book-open"></i> Course Enrollments</h5>
-        </div>
-        <div class="card-body">
-            @if (Model.Enrollments != null && Model.Enrollments.Any())
-            {
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Course Code</th>
-                                <th>Course Name</th>
-                                <th>Enrollment Date</th>
-                                <th>Status</th>
-                                <th>Final Grade</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var enrollment in Model.Enrollments.OrderByDescending(e => e.EnrollmentDate))
-                            {
-                                <tr>
-                                    <td>@enrollment.Course?.CourseCode</td>
-                                    <td>@enrollment.Course?.CourseName</td>
-                                    <td>@enrollment.EnrollmentDate.ToString("dd/MM/yyyy")</td>
-                                    <td>
-                                        <span class="badge @(enrollment.Status == "Enrolled" ? "bg-primary" : enrollment.Status == "Completed" ? "bg-success" : "bg-secondary")">
-                                            @enrollment.Status
-                                        </span>
-                                    </td>
-                                    <td>
-                                        @if (!string.IsNullOrEmpty(enrollment.FinalGrade))
-                                        {
-                                            <strong class="text-primary">@enrollment.FinalGrade</strong>
-                                        }
-                                        else
-                                        {
-                                            <span class="text-muted">-</span>
-                                        }
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
+    <!-- Academic Program Information -->
+    @if (Model.AcademicProgram != null)
+    {
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-graduation-cap"></i> My Academic Program</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Program:</strong> @Model.AcademicProgram.ProgramName</p>
+                        <p><strong>Program Code:</strong> @Model.AcademicProgram.ProgramCode</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Duration:</strong> @Model.AcademicProgram.Duration years</p>
+                        <p><strong>Credits Required:</strong> @Model.AcademicProgram.CreditsRequired</p>
+                    </div>
                 </div>
-            }
-            else
-            {
-                <p class="text-muted text-center py-3">No enrollments found.</p>
-            }
+            </div>
         </div>
-    </div>
+    }
 
-    <!-- Academic Records Section -->
-    <div class="card shadow-sm">
-        <div class="card-header bg-warning text-dark">
-            <h5 class="mb-0"><i class="fas fa-chart-line"></i> Academic Records</h5>
+    <!-- Courses Grouped by Semester/Academic Year -->
+    @if (Model.Enrollments != null && Model.Enrollments.Any())
+    {
+        var coursesBySemester = Model.Enrollments
+            .Where(e => e.Course != null)
+            .GroupBy(e => new { 
+                Semester = e.Course.Semester ?? 0, 
+                AcademicYear = e.Course.AcademicYear ?? "N/A" 
+            })
+            .OrderBy(g => g.Key.AcademicYear)
+            .ThenBy(g => g.Key.Semester)
+            .ToList();
+
+        @foreach (var semesterGroup in coursesBySemester)
+        {
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-book-open"></i> 
+                        Semester @semesterGroup.Key.Semester - Academic Year @semesterGroup.Key.AcademicYear
+                        <span class="badge bg-light text-dark ms-2">@semesterGroup.Count() course(s)</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Course Code</th>
+                                    <th>Course Name</th>
+                                    <th>Credits</th>
+                                    <th>Enrollment Date</th>
+                                    <th>Status</th>
+                                    <th>Final Grade</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var enrollment in semesterGroup.OrderBy(e => e.Course?.CourseCode))
+                                {
+                                    <tr>
+                                        <td><strong>@enrollment.Course?.CourseCode</strong></td>
+                                        <td>@enrollment.Course?.CourseName</td>
+                                        <td>@enrollment.Course?.Credits</td>
+                                        <td>@enrollment.EnrollmentDate.ToString("dd/MM/yyyy")</td>
+                                        <td>
+                                            <span class="badge @(enrollment.Status == "Enrolled" ? "bg-primary" : enrollment.Status == "Completed" ? "bg-success" : "bg-secondary")">
+                                                @enrollment.Status
+                                            </span>
+                                        </td>
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(enrollment.FinalGrade))
+                                            {
+                                                <strong class="text-primary">@enrollment.FinalGrade</strong>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">Pending</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> No courses enrolled. Please contact administrator to enroll in courses.
+        </div>
+    }
+
+    <!-- Course Summary -->
+    <div class="card shadow-sm mt-4">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Course Statistics</h5>
         </div>
         <div class="card-body">
-            @if (Model.AcademicRecords != null && Model.AcademicRecords.Any())
-            {
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Course</th>
-                                <th>Assignment Type</th>
-                                <th>Score</th>
-                                <th>Max Score</th>
-                                <th>Weight (%)</th>
-                                <th>Graded Date</th>
-                                <th>Graded By</th>
-                                <th>Notes</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var record in Model.AcademicRecords.OrderByDescending(ar => ar.GradedDate ?? ar.CreatedAt))
-                            {
-                                <tr>
-                                    <td>
-                                        <strong>@record.Course?.CourseCode</strong>
-                                        <br />
-                                        <small class="text-muted">@record.Course?.CourseName</small>
-                                    </td>
-                                    <td>@record.AssignmentType</td>
-                                    <td><strong>@record.Score.ToString("0.00")</strong></td>
-                                    <td>@record.MaxScore.ToString("0.00")</td>
-                                    <td>@(record.Weight?.ToString("0.00") ?? "-")</td>
-                                    <td>@(record.GradedDate?.ToString("dd/MM/yyyy") ?? "-")</td>
-                                    <td>
-                                        @if (record.Teacher != null)
-                                        {
-                                            <small>@record.Teacher.FullName</small>
-                                        }
-                                        else
-                                        {
-                                            <span class="text-muted">-</span>
-                                        }
-                                    </td>
-                                    <td>
-                                        @if (!string.IsNullOrEmpty(record.Notes))
-                                        {
-                                            <small>@record.Notes</small>
-                                        }
-                                        else
-                                        {
-                                            <span class="text-muted">-</span>
-                                        }
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="text-center p-3 bg-light rounded">
+                        <h3 class="text-primary mb-0">@(Model.Enrollments?.Count() ?? 0)</h3>
+                        <p class="mb-0"><strong>Total Courses</strong></p>
+                    </div>
                 </div>
-            }
-            else
-            {
-                <p class="text-muted text-center py-3">No academic records found.</p>
-            }
+                <div class="col-md-3">
+                    <div class="text-center p-3 bg-light rounded">
+                        <h3 class="text-success mb-0">@(Model.Enrollments?.Count(e => e.Status == "Enrolled") ?? 0)</h3>
+                        <p class="mb-0"><strong>Active Courses</strong></p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center p-3 bg-light rounded">
+                        <h3 class="text-info mb-0">@(Model.Enrollments?.Where(e => e.Status == "Completed").Sum(e => e.Course?.Credits ?? 0) ?? 0)</h3>
+                        <p class="mb-0"><strong>Completed Credits</strong></p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center p-3 bg-light rounded">
+                        <h3 class="text-warning mb-0">@(Model.Enrollments?.Where(e => e.Status == "Enrolled").Sum(e => e.Course?.Credits ?? 0) ?? 0)</h3>
+                        <p class="mb-0"><strong>Current Credits</strong></p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

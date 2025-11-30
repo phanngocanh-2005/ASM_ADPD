@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using AuthApp.Models;
 
 namespace AuthApp.Models.ViewModels
 {
@@ -17,7 +18,7 @@ namespace AuthApp.Models.ViewModels
         public string StudentName { get; set; } = string.Empty;
         public string StudentCode { get; set; } = string.Empty;
         
-        [Range(0, 100, ErrorMessage = "Điểm phải từ 0 đến 100")]
+        [Range(0, 100, ErrorMessage = "Score must be between 0 and 100")]
         public decimal? Grade { get; set; }
         
         public decimal MaxScore { get; set; } = 100;
@@ -25,5 +26,22 @@ namespace AuthApp.Models.ViewModels
         
         // Thuộc tính này dùng để lưu điểm hiện tại (nếu có)
         public decimal? ExistingGrade { get; set; }
+        
+        // Loại assignment (Midterm, Final, Assignment, Quiz, etc.)
+        public string? AssignmentType { get; set; }
+    }
+
+    public class StudentGradesViewModel
+    {
+        public Student Student { get; set; } = null!;
+        public List<CourseGradesViewModel> GradesByCourse { get; set; } = new();
+    }
+
+    public class CourseGradesViewModel
+    {
+        public Course Course { get; set; } = null!;
+        public List<AcademicRecord> Records { get; set; } = new();
+        public decimal AverageScore { get; set; }
+        public int TotalRecords { get; set; }
     }
 }

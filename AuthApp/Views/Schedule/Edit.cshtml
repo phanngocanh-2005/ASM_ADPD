@@ -1,0 +1,99 @@
+@model AuthApp.Models.Schedule
+
+@{
+    ViewData["Title"] = "Edit Schedule";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary">
+            <i class="fas fa-edit"></i> Edit Schedule
+        </h2>
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form asp-action="Edit" method="post">
+                <input type="hidden" asp-for="Id" />
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="CourseId" class="form-label">Course <span class="text-danger">*</span></label>
+                        <select asp-for="CourseId" class="form-select" asp-items="ViewBag.Courses">
+                            <option value="">-- Select Course --</option>
+                        </select>
+                        <span asp-validation-for="CourseId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="DayOfWeek" class="form-label">Day of Week <span class="text-danger">*</span></label>
+                        <select asp-for="DayOfWeek" class="form-select" asp-items="ViewBag.DayOfWeekOptions">
+                            <option value="">-- Select Day --</option>
+                        </select>
+                        <span asp-validation-for="DayOfWeek" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="StartTime" class="form-label">Start Time <span class="text-danger">*</span></label>
+                        <input asp-for="StartTime" type="time" class="form-control" />
+                        <span asp-validation-for="StartTime" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="EndTime" class="form-label">End Time <span class="text-danger">*</span></label>
+                        <input asp-for="EndTime" type="time" class="form-control" />
+                        <span asp-validation-for="EndTime" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Room" class="form-label">Room</label>
+                        <input asp-for="Room" class="form-control" placeholder="e.g., A101" />
+                        <span asp-validation-for="Room" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Building" class="form-label">Building</label>
+                        <input asp-for="Building" class="form-control" placeholder="e.g., Main Building" />
+                        <span asp-validation-for="Building" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="ClassType" class="form-label">Class Type</label>
+                        <select asp-for="ClassType" class="form-select" asp-items="ViewBag.ClassTypeOptions">
+                            <option value="">-- Select Type --</option>
+                        </select>
+                        <span asp-validation-for="ClassType" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Status" class="form-label">Status <span class="text-danger">*</span></label>
+                        <select asp-for="Status" class="form-select" asp-items="ViewBag.StatusOptions"></select>
+                        <span asp-validation-for="Status" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Update Schedule
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+

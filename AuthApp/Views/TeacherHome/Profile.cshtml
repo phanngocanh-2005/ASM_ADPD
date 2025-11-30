@@ -1,17 +1,20 @@
 @model AuthApp.Models.Teacher
 
 @{
-    ViewData["Title"] = "My Teaching Profile";
+    ViewData["Title"] = "Teacher Profile";
 }
 
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="text-primary">
-            <i class="fas fa-id-card-alt"></i> My Teaching Profile
+            <i class="fas fa-user-circle"></i> Teacher Profile
         </h2>
         <div>
+            <a asp-action="Index" class="btn btn-outline-secondary me-2">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
             <a asp-action="EditProfile" class="btn btn-primary">
-                <i class="fas fa-edit"></i> Update Profile
+                <i class="fas fa-edit"></i> Edit Profile
             </a>
         </div>
     </div>
@@ -33,6 +36,7 @@
     }
 
     <div class="row g-4 mb-4">
+        <!-- Personal Information Card -->
         <div class="col-md-6">
             <div class="card shadow-sm h-100">
                 <div class="card-header bg-primary text-white">
@@ -41,69 +45,107 @@
                 <div class="card-body">
                     <table class="table table-borderless mb-0">
                         <tr>
-                            <th width="35%">Teacher Code</th>
-                            <td><strong>@Model.TeacherCode</strong></td>
+                            <th width="40%" class="text-muted">Teacher Code:</th>
+                            <td><strong class="text-primary">@Model.TeacherCode</strong></td>
                         </tr>
                         <tr>
-                            <th>Full Name</th>
-                            <td>@Model.FullName</td>
+                            <th class="text-muted">Full Name:</th>
+                            <td><strong>@Model.FullName</strong></td>
                         </tr>
                         <tr>
-                            <th>Date of Birth</th>
+                            <th class="text-muted">Date of Birth:</th>
                             <td>@(Model.DateOfBirth?.ToString("dd/MM/yyyy") ?? "-")</td>
                         </tr>
                         <tr>
-                            <th>Gender</th>
-                            <td>@(Model.Gender ?? "-")</td>
+                            <th class="text-muted">Gender:</th>
+                            <td>
+                                @if (!string.IsNullOrEmpty(Model.Gender))
+                                {
+                                    <span class="badge bg-info">@Model.Gender</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </td>
                         </tr>
                         <tr>
-                            <th>Phone</th>
-                            <td>@(Model.PhoneNumber ?? "-")</td>
+                            <th class="text-muted">Phone Number:</th>
+                            <td>
+                                @if (!string.IsNullOrEmpty(Model.PhoneNumber))
+                                {
+                                    <i class="fas fa-phone text-primary"></i> @Model.PhoneNumber
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </td>
                         </tr>
                         <tr>
-                            <th>Email</th>
-                            <td>@(Model.Email ?? Model.Account?.Email ?? "-")</td>
+                            <th class="text-muted">Email:</th>
+                            <td>
+                                @if (!string.IsNullOrEmpty(Model.Email))
+                                {
+                                    <i class="fas fa-envelope text-primary"></i> @Model.Email
+                                }
+                                else if (Model.Account != null && !string.IsNullOrEmpty(Model.Account.Email))
+                                {
+                                    <i class="fas fa-envelope text-primary"></i> @Model.Account.Email
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </td>
                         </tr>
                     </table>
                 </div>
             </div>
         </div>
+
+        <!-- Account & Professional Information Card -->
         <div class="col-md-6">
             <div class="card shadow-sm h-100">
                 <div class="card-header bg-info text-white">
-                    <h5 class="mb-0"><i class="fas fa-briefcase"></i> Professional Details</h5>
+                    <h5 class="mb-0"><i class="fas fa-briefcase"></i> Account & Professional Information</h5>
                 </div>
                 <div class="card-body">
                     <table class="table table-borderless mb-0">
                         <tr>
-                            <th width="35%">Account</th>
+                            <th width="40%" class="text-muted">Account:</th>
                             <td>
                                 @if (Model.Account != null)
                                 {
                                     <span class="badge bg-success">@Model.Account.Username</span>
-                                    <div class="small text-muted">@Model.Account.Email</div>
+                                    @if (!string.IsNullOrEmpty(Model.Account.Email))
+                                    {
+                                        <br />
+                                        <small class="text-muted">@Model.Account.Email</small>
+                                    }
                                 }
                                 else
                                 {
-                                    <span class="text-muted">Not linked</span>
+                                    <span class="text-muted">No account linked</span>
                                 }
                             </td>
                         </tr>
                         <tr>
-                            <th>Department</th>
+                            <th class="text-muted">Department:</th>
                             <td>@(Model.Department ?? "-")</td>
                         </tr>
                         <tr>
-                            <th>Specialization</th>
+                            <th class="text-muted">Specialization:</th>
                             <td>@(Model.Specialization ?? "-")</td>
                         </tr>
                         <tr>
-                            <th>Program</th>
+                            <th class="text-muted">Academic Program:</th>
                             <td>
                                 @if (Model.AcademicProgram != null)
                                 {
                                     <span class="badge bg-primary">@Model.AcademicProgram.ProgramCode</span>
-                                    <div class="small text-muted">@Model.AcademicProgram.ProgramName</div>
+                                    <br />
+                                    <small class="text-muted">@Model.AcademicProgram.ProgramName</small>
                                 }
                                 else
                                 {
@@ -112,16 +154,20 @@
                             </td>
                         </tr>
                         <tr>
-                            <th>Status</th>
+                            <th class="text-muted">Status:</th>
                             <td>
-                                <span class="badge @(Model.Status == "Active" ? "bg-success" : "bg-secondary")">
+                                <span class="badge @(Model.Status == "Active" ? "bg-success" : Model.Status == "Retired" ? "bg-secondary" : "bg-warning text-dark")">
                                     @Model.Status
                                 </span>
                             </td>
                         </tr>
                         <tr>
-                            <th>Joined</th>
+                            <th class="text-muted">Created At:</th>
                             <td>@Model.CreatedAt.ToString("dd/MM/yyyy")</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Last Updated:</th>
+                            <td>@(Model.UpdatedAt?.ToString("dd/MM/yyyy") ?? "-")</td>
                         </tr>
                     </table>
                 </div>
@@ -129,20 +175,21 @@
         </div>
     </div>
 
+    <!-- Assigned Courses Section -->
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-success text-white">
             <h5 class="mb-0"><i class="fas fa-book"></i> Assigned Courses</h5>
         </div>
         <div class="card-body">
-            @if (Model.CourseAssignments.Any())
+            @if (Model.CourseAssignments != null && Model.CourseAssignments.Any())
             {
                 <div class="table-responsive">
-                    <table class="table table-striped align-middle">
-                        <thead>
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
                             <tr>
                                 <th>Course Code</th>
                                 <th>Course Name</th>
-                                <th>Assigned Date</th>
+                                <th>Assignment Date</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
@@ -150,7 +197,7 @@
                             @foreach (var assignment in Model.CourseAssignments.OrderByDescending(ca => ca.AssignmentDate))
                             {
                                 <tr>
-                                    <td>@assignment.Course?.CourseCode</td>
+                                    <td><strong>@assignment.Course?.CourseCode</strong></td>
                                     <td>@assignment.Course?.CourseName</td>
                                     <td>@assignment.AssignmentDate.ToString("dd/MM/yyyy")</td>
                                     <td>
@@ -166,28 +213,53 @@
             }
             else
             {
-                <p class="text-muted mb-0">No course assignments yet.</p>
+                <div class="alert alert-info mb-0">
+                    <i class="fas fa-info-circle"></i> No course assignments found. Contact the administrator to assign courses to you.
+                </div>
             }
         </div>
     </div>
 
+    <!-- Grading Records Section -->
     <div class="card shadow-sm">
         <div class="card-header bg-warning text-dark">
-            <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Grading Records</h5>
+            <h5 class="mb-0"><i class="fas fa-chart-line"></i> Grading Records</h5>
         </div>
         <div class="card-body">
-            @if (Model.AcademicRecords.Any())
+            @if (Model.AcademicRecords != null && Model.AcademicRecords.Any())
             {
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <div class="text-center p-3 bg-light rounded">
+                            <h3 class="text-primary mb-0">@Model.AcademicRecords.Count</h3>
+                            <small class="text-muted">Total Records</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center p-3 bg-light rounded">
+                            <h3 class="text-success mb-0">@Model.AcademicRecords.Select(ar => ar.StudentId).Distinct().Count()</h3>
+                            <small class="text-muted">Students Graded</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center p-3 bg-light rounded">
+                            <h3 class="text-info mb-0">@Model.AcademicRecords.Select(ar => ar.CourseId).Distinct().Count()</h3>
+                            <small class="text-muted">Courses</small>
+                        </div>
+                    </div>
+                </div>
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
-                        <thead>
+                        <thead class="table-light">
                             <tr>
                                 <th>Course</th>
                                 <th>Student</th>
-                                <th>Assignment</th>
+                                <th>Assignment Type</th>
                                 <th>Score</th>
+                                <th>Max Score</th>
                                 <th>Weight (%)</th>
                                 <th>Graded Date</th>
+                                <th>Notes</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -195,13 +267,15 @@
                             {
                                 <tr>
                                     <td>
-                                        <strong>@record.Course?.CourseCode</strong><br />
+                                        <strong>@record.Course?.CourseCode</strong>
+                                        <br />
                                         <small class="text-muted">@record.Course?.CourseName</small>
                                     </td>
                                     <td>
                                         @if (record.Student != null)
                                         {
-                                            <strong>@record.Student.StudentCode</strong><br />
+                                            <strong>@record.Student.StudentCode</strong>
+                                            <br />
                                             <small class="text-muted">@record.Student.FullName</small>
                                         }
                                         else
@@ -209,10 +283,21 @@
                                             <span class="text-muted">-</span>
                                         }
                                     </td>
-                                    <td>@record.AssignmentType</td>
-                                    <td><strong>@record.Score.ToString("0.00") / @record.MaxScore.ToString("0.00")</strong></td>
+                                    <td><span class="badge bg-secondary">@record.AssignmentType</span></td>
+                                    <td><strong>@record.Score.ToString("0.00")</strong></td>
+                                    <td>@record.MaxScore.ToString("0.00")</td>
                                     <td>@(record.Weight?.ToString("0.00") ?? "-")</td>
                                     <td>@(record.GradedDate?.ToString("dd/MM/yyyy") ?? "-")</td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(record.Notes))
+                                        {
+                                            <small>@record.Notes</small>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </td>
                                 </tr>
                             }
                         </tbody>
@@ -221,10 +306,10 @@
             }
             else
             {
-                <p class="text-muted mb-0">No grading records yet.</p>
+                <div class="alert alert-info mb-0">
+                    <i class="fas fa-info-circle"></i> No grading records found.
+                </div>
             }
         </div>
     </div>
 </div>
-
-

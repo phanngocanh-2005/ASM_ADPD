@@ -51,6 +51,8 @@ namespace AuthApp.Models
         public ICollection<CourseAssignment> CourseAssignments { get; set; } = new List<CourseAssignment>();
 
         public ICollection<AcademicRecord> AcademicRecords { get; set; } = new List<AcademicRecord>();
+
+        public ICollection<Schedule> Schedules { get; set; } = new List<Schedule>();
     }
 }
 
