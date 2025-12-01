@@ -3,15 +3,18 @@ using System.Linq;
 using System.Threading.Tasks;
 using AuthApp.Data;
 using AuthApp.Models;
+using AuthApp.Patterns.Factory;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace AuthApp.Controllers
 {
+    // Controller quản lý việc phân công môn học cho giáo viên (CourseAssignment)
     [Authorize(Roles = "Admin")]
     public class CourseAssignmentController : Controller
     {
+        // DbContext làm việc với database
         private readonly ApplicationDbContext _context;
 
         public CourseAssignmentController(ApplicationDbContext context)
@@ -19,7 +22,7 @@ namespace AuthApp.Controllers
             _context = context;
         }
 
-        // Display list of course assignments
+        // Hiển thị danh sách các phân công môn học
         public async Task<IActionResult> Index()
         {
             var assignments = await _context.CourseAssignments
@@ -31,7 +34,7 @@ namespace AuthApp.Controllers
             return View(assignments);
         }
 
-        // Display form to create new assignment
+        // Hiển thị form tạo mới phân công môn học
         public async Task<IActionResult> Create()
         {
             ViewBag.Teachers = await _context.Teachers
@@ -45,30 +48,36 @@ namespace AuthApp.Controllers
             return View();
         }
 
-        // Handle creating new assignment
+        // Xử lý submit tạo mới phân công môn học
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("TeacherId,CourseId,Status")] CourseAssignment assignment)
         {
+            // Chỉ xử lý khi ModelState hợp lệ (đã chọn Teacher, Course, Status)
             if (ModelState.IsValid)
             {
                 try
                 {
+                    // Gán ngày phân công + ngày tạo
                     assignment.AssignmentDate = DateTime.Now;
                     assignment.CreatedAt = DateTime.Now;
 
+                    // Thêm bản ghi vào DbContext và lưu xuống DB
                     _context.Add(assignment);
                     await _context.SaveChangesAsync();
 
-                    TempData["SuccessMessage"] = "Course assigned successfully! " +
-                        "The teacher can now view this course in Grade Management. " +
-                        "Remember to create a schedule for this course so the teacher can see it in their weekly schedule.";
+                    // Tạo thông báo thành công bằng Factory Method
+                    var notification = NotificationFactory.CreateSuccess(
+                        "Course assigned successfully! The teacher can now view this course in Grade Management. " +
+                        "Remember to create a schedule for this course so the teacher can see it in their weekly schedule.");
+                    TempData["SuccessMessage"] = notification.Message;
                     return RedirectToAction(nameof(Index));
                 }
+                // Bắt lỗi khi lưu DB (ví dụ trùng phân công, vi phạm FK, ...)
                 catch (DbUpdateException ex)
                 {
-                    var message = ex.InnerException?.Message ?? ex.Message;
-                    ModelState.AddModelError(string.Empty, $"Could not save course assignment: {message}");
+                    var error = NotificationFactory.CreateError(ex.InnerException?.Message ?? ex.Message);
+                    ModelState.AddModelError(string.Empty, $"Could not save course assignment: {error.Message}");
                 }
             }
 
