@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
-using AuthApp.Data;
+﻿using AuthApp.Data;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,10 +12,12 @@ builder.Services.AddControllersWithViews();
 
 // Configure DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
+{
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")
-    )
-);
+    );
+    options.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
+});
 
 // Configure Authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -45,6 +49,8 @@ builder.Services.AddSession(options =>
 });
 
 var app = builder.Build();
+
+// NOTE: Database schema is managed via SQL scripts; automatic EF migrations on startup are disabled
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

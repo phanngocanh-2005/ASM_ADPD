@@ -4902,11 +4902,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\APDP\\ASM_ADPD - Copy (2)\\AuthApp\\AuthApp.csproj",
+      "projectUniqueName": "D:\\APDP\\ASM_ADPD - Copy (2) - Copy\\AuthApp\\AuthApp.csproj",
       "projectName": "AuthApp",
-      "projectPath": "D:\\APDP\\ASM_ADPD - Copy (2)\\AuthApp\\AuthApp.csproj",
+      "projectPath": "D:\\APDP\\ASM_ADPD - Copy (2) - Copy\\AuthApp\\AuthApp.csproj",
       "packagesPath": "C:\\Users\\lenovo\\.nuget\\packages\\",
-      "outputPath": "D:\\APDP\\ASM_ADPD - Copy (2)\\AuthApp\\obj\\",
+      "outputPath": "D:\\APDP\\ASM_ADPD - Copy (2) - Copy\\AuthApp\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\lenovo\\AppData\\Roaming\\NuGet\\NuGet.Config",

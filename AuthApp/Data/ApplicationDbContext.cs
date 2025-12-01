@@ -189,6 +189,11 @@ namespace AuthApp.Data
                     .WithMany(c => c.Schedules)
                     .HasForeignKey(x => x.CourseId)
                     .OnDelete(DeleteBehavior.Cascade);
+
+                e.HasOne(x => x.Teacher)
+                    .WithMany(t => t.Schedules)
+                    .HasForeignKey(x => x.TeacherId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             base.OnModelCreating(modelBuilder);

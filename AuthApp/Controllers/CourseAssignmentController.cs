@@ -52,18 +52,26 @@ namespace AuthApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                assignment.AssignmentDate = DateTime.Now;
-                assignment.CreatedAt = DateTime.Now;
-                
-                _context.Add(assignment);
-                await _context.SaveChangesAsync();
-                
-                TempData["SuccessMessage"] = "Course assigned successfully! " +
-                    "The teacher can now view this course in Grade Management. " +
-                    "Remember to create a schedule for this course so the teacher can see it in their weekly schedule.";
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    assignment.AssignmentDate = DateTime.Now;
+                    assignment.CreatedAt = DateTime.Now;
+
+                    _context.Add(assignment);
+                    await _context.SaveChangesAsync();
+
+                    TempData["SuccessMessage"] = "Course assigned successfully! " +
+                        "The teacher can now view this course in Grade Management. " +
+                        "Remember to create a schedule for this course so the teacher can see it in their weekly schedule.";
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (DbUpdateException ex)
+                {
+                    var message = ex.InnerException?.Message ?? ex.Message;
+                    ModelState.AddModelError(string.Empty, $"Could not save course assignment: {message}");
+                }
             }
-            
+
             ViewBag.Teachers = await _context.Teachers
                 .Where(t => t.Status == "Active")
                 .OrderBy(t => t.FullName)

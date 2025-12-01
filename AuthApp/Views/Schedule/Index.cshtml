@@ -38,6 +38,7 @@
                         <thead class="table-light">
                             <tr>
                                 <th>Course</th>
+                                <th>Teacher</th>
                                 <th>Day of Week</th>
                                 <th>Time</th>
                                 <th>Room</th>
@@ -55,6 +56,11 @@
                                         <strong>@schedule.Course?.CourseCode</strong>
                                         <br />
                                         <small class="text-muted">@schedule.Course?.CourseName</small>
+                                    </td>
+                                    <td>
+                                        <strong>@schedule.Teacher?.FullName</strong>
+                                        <br />
+                                        <small class="text-muted">@schedule.Teacher?.TeacherCode</small>
                                     </td>
                                     <td>@schedule.DayOfWeek</td>
                                     <td>

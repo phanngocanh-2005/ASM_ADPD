@@ -1,4 +1,10 @@
 @model AuthApp.Models.Schedule
+@using Microsoft.AspNetCore.Mvc.Rendering
+@using System.Linq
+
+@{
+    var timeSlots = ViewBag.TimeSlotOptions as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>();
+}
 
 @{
     ViewData["Title"] = "Create Schedule";
@@ -29,6 +35,17 @@
                     </div>
 
                     <div class="col-md-6 mb-3">
+                        <label asp-for="TeacherId" class="form-label fw-bold">Teacher <span class="text-danger">*</span></label>
+                        <select asp-for="TeacherId" class="form-select" asp-items="ViewBag.Teachers" required>
+                            <option value="">-- Select Teacher --</option>
+                        </select>
+                        <span asp-validation-for="TeacherId" class="text-danger"></span>
+                        <small class="form-text text-muted">Only active teachers are shown.</small>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
                         <label asp-for="DayOfWeek" class="form-label fw-bold">Day of Week <span class="text-danger">*</span></label>
                         <select asp-for="DayOfWeek" class="form-select" asp-items="ViewBag.DayOfWeekOptions" required>
                             <option value="">-- Select Day --</option>
@@ -39,17 +56,15 @@
 
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label class="form-label fw-bold">Time Slot <span class="text-danger">*</span></label>
-                        <select id="timeSlotSelect" class="form-select" required>
+                        <label class="form-label fw-bold">Time Slot</label>
+                        <select id="timeSlotSelect" class="form-select">
                             <option value="">-- Select Time Slot --</option>
-                            <option value="07:00-07:10">07:00 - 07:10</option>
-                            <option value="07:10-07:20">07:10 - 07:20</option>
-                            <option value="07:20-07:30">07:20 - 07:30</option>
-                            <option value="07:30-07:40">07:30 - 07:40</option>
-                            <option value="07:40-07:50">07:40 - 07:50</option>
-                            <option value="07:50-08:00">07:50 - 08:00</option>
+                            @foreach (var slot in timeSlots)
+                            {
+                                <option value="@slot.Value">@slot.Text</option>
+                            }
                         </select>
-                        <small class="form-text text-muted">Select from predefined 10-minute time slots starting from 7:00 AM</small>
+                        <small class="form-text text-muted">Each slot lasts 2 hours with a 10-minute buffer.</small>
                     </div>
 
                     <div class="col-md-3 mb-3">
@@ -115,8 +130,8 @@
             if (selectedSlot) {
                 var times = selectedSlot.split('-');
                 if (times.length === 2) {
-                    document.getElementById('startTime').value = times[0].trim() + ':00';
-                    document.getElementById('endTime').value = times[1].trim() + ':00';
+                    document.getElementById('startTime').value = times[0].trim();
+                    document.getElementById('endTime').value = times[1].trim();
                 }
             }
         });

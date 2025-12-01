@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "RcWxtxC+0ns=",
+  "dgSpecHash": "QcidRt5bJgs=",
   "success": true,
-  "projectFilePath": "D:\\APDP\\ASM_ADPD - Copy (2)\\AuthApp\\AuthApp.csproj",
+  "projectFilePath": "D:\\APDP\\ASM_ADPD - Copy (2) - Copy\\AuthApp\\AuthApp.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\lenovo\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\lenovo\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",

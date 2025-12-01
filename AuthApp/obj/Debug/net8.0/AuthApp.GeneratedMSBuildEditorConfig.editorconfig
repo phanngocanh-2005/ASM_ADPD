@@ -17,231 +17,231 @@ build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = AuthApp
 build_property.RootNamespace = AuthApp
-build_property.ProjectDir = D:\APDP\ASM_ADPD - Copy (2)\AuthApp\
+build_property.ProjectDir = D:\APDP\ASM_ADPD - Copy (2) - Copy\AuthApp\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 8.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = D:\APDP\ASM_ADPD - Copy (2)\AuthApp
+build_property.MSBuildProjectDirectory = D:\APDP\ASM_ADPD - Copy (2) - Copy\AuthApp
 build_property._RazorSourceGeneratorDebug = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/AdminHome/CreateAccount.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/AdminHome/CreateAccount.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5Ib21lXENyZWF0ZUFjY291bnQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/AdminHome/DeleteAccount.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/AdminHome/DeleteAccount.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5Ib21lXERlbGV0ZUFjY291bnQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/AdminHome/EditAccount.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/AdminHome/EditAccount.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5Ib21lXEVkaXRBY2NvdW50LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/AdminHome/Index.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/AdminHome/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5Ib21lXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/AdminHome/ListAccounts.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/AdminHome/ListAccounts.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5Ib21lXExpc3RBY2NvdW50cy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/AdminManagement/CreateProgram.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/AdminManagement/CreateProgram.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5NYW5hZ2VtZW50XENyZWF0ZVByb2dyYW0uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/AdminManagement/CreateStudent.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/AdminManagement/CreateStudent.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5NYW5hZ2VtZW50XENyZWF0ZVN0dWRlbnQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/AdminManagement/CreateTeacher.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/AdminManagement/CreateTeacher.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5NYW5hZ2VtZW50XENyZWF0ZVRlYWNoZXIuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/AdminManagement/DeleteProgram.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/AdminManagement/DeleteProgram.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5NYW5hZ2VtZW50XERlbGV0ZVByb2dyYW0uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/AdminManagement/DeleteStudent.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/AdminManagement/DeleteStudent.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5NYW5hZ2VtZW50XERlbGV0ZVN0dWRlbnQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/AdminManagement/DeleteTeacher.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/AdminManagement/DeleteTeacher.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5NYW5hZ2VtZW50XERlbGV0ZVRlYWNoZXIuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/AdminManagement/EditProgram.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/AdminManagement/EditProgram.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5NYW5hZ2VtZW50XEVkaXRQcm9ncmFtLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/AdminManagement/EditStudent.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/AdminManagement/EditStudent.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5NYW5hZ2VtZW50XEVkaXRTdHVkZW50LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/AdminManagement/EditTeacher.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/AdminManagement/EditTeacher.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5NYW5hZ2VtZW50XEVkaXRUZWFjaGVyLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/AdminManagement/Programs.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/AdminManagement/Programs.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5NYW5hZ2VtZW50XFByb2dyYW1zLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/AdminManagement/StudentProfile.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/AdminManagement/StudentProfile.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5NYW5hZ2VtZW50XFN0dWRlbnRQcm9maWxlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/AdminManagement/Students.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/AdminManagement/Students.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5NYW5hZ2VtZW50XFN0dWRlbnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/AdminManagement/TeacherProfile.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/AdminManagement/TeacherProfile.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5NYW5hZ2VtZW50XFRlYWNoZXJQcm9maWxlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/AdminManagement/Teachers.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/AdminManagement/Teachers.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5NYW5hZ2VtZW50XFRlYWNoZXJzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/CourseAssignment/Create.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/CourseAssignment/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ291cnNlQXNzaWdubWVudFxDcmVhdGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/CourseAssignment/Index.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/CourseAssignment/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ291cnNlQXNzaWdubWVudFxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/Grading/GradeStudents.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/Grading/GradeStudents.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR3JhZGluZ1xHcmFkZVN0dWRlbnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/Grading/Index.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/Grading/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR3JhZGluZ1xJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/Home/Index.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/Home/Privacy.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/Home/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/Login/Index.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/Login/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9naW5cSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/Login/Success.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/Login/Success.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9naW5cU3VjY2Vzcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/Login/TeacherLogin.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/Login/TeacherLogin.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9naW5cVGVhY2hlckxvZ2luLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/Register/Index.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/Register/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVnaXN0ZXJcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/Register/Success.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/Register/Success.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVnaXN0ZXJcU3VjY2Vzcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/Schedule/Create.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/Schedule/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NoZWR1bGVcQ3JlYXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/Schedule/Delete.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/Schedule/Delete.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NoZWR1bGVcRGVsZXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/Schedule/Edit.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/Schedule/Edit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NoZWR1bGVcRWRpdC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/Schedule/Index.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/Schedule/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NoZWR1bGVcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/Shared/Error.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/Shared/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/Shared/_AdminShortcuts.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/Shared/_AdminShortcuts.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9BZG1pblNob3J0Y3V0cy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/Shared/_TeacherNavigation.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/Shared/_TeacherNavigation.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9UZWFjaGVyTmF2aWdhdGlvbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/Shared/_ValidationScriptsPartial.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/StudentHome/Courses.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/StudentHome/Courses.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3R1ZGVudEhvbWVcQ291cnNlcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/StudentHome/CreateProfile.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/StudentHome/CreateProfile.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3R1ZGVudEhvbWVcQ3JlYXRlUHJvZmlsZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/StudentHome/DeleteProfile.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/StudentHome/DeleteProfile.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3R1ZGVudEhvbWVcRGVsZXRlUHJvZmlsZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/StudentHome/EditProfile.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/StudentHome/EditProfile.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3R1ZGVudEhvbWVcRWRpdFByb2ZpbGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/StudentHome/Grades.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/StudentHome/Grades.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3R1ZGVudEhvbWVcR3JhZGVzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/StudentHome/Index.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/StudentHome/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3R1ZGVudEhvbWVcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/StudentHome/Profile.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/StudentHome/Profile.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3R1ZGVudEhvbWVcUHJvZmlsZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/StudentHome/Schedule.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/StudentHome/Schedule.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3R1ZGVudEhvbWVcU2NoZWR1bGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/Task/Create.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/Task/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGFza1xDcmVhdGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/Task/Index.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/Task/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGFza1xJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/TeacherHome/EditProfile.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/TeacherHome/EditProfile.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGVhY2hlckhvbWVcRWRpdFByb2ZpbGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/TeacherHome/Index.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/TeacherHome/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGVhY2hlckhvbWVcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/TeacherHome/Profile.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/TeacherHome/Profile.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGVhY2hlckhvbWVcUHJvZmlsZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/TeacherHome/Schedule.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/TeacherHome/Schedule.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGVhY2hlckhvbWVcU2NoZWR1bGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/_ViewImports.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/_ViewStart.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/APDP/ASM_ADPD - Copy (2)/AuthApp/Views/Shared/_Layout.cshtml]
+[D:/APDP/ASM_ADPD - Copy (2) - Copy/AuthApp/Views/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = b-wujnlrqfxs

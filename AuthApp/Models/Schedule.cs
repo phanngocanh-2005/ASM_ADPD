@@ -14,6 +14,9 @@ namespace AuthApp.Models
         public int CourseId { get; set; }
 
         [Required]
+        public int TeacherId { get; set; }
+
+        [Required]
         [StringLength(20)]
         public string DayOfWeek { get; set; } = string.Empty; // Monday, Tuesday, etc.
 
@@ -40,8 +43,9 @@ namespace AuthApp.Models
 
         public DateTime? UpdatedAt { get; set; }
 
-        // Navigation property
+        // Navigation properties
         public Course Course { get; set; } = null!;
+        public Teacher Teacher { get; set; } = null!;
     }
 }
 

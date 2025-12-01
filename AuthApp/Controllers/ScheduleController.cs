@@ -16,6 +16,12 @@ namespace AuthApp.Controllers
     {
         private readonly ApplicationDbContext _context;
 
+        private static readonly TimeSpan SlotStartTime = new(7, 0, 0);
+        private static readonly TimeSpan SlotDuration = TimeSpan.FromHours(2);
+        private static readonly TimeSpan SlotGap = TimeSpan.FromMinutes(10);
+        private const int SlotsPerDay = 6;
+        private static readonly IReadOnlyList<(TimeSpan Start, TimeSpan End)> StandardTimeSlots = BuildTimeSlots();
+
         public ScheduleController(ApplicationDbContext context)
         {
             _context = context;
@@ -28,6 +34,7 @@ namespace AuthApp.Controllers
             {
                 var schedules = await _context.Schedules
                     .Include(s => s.Course)
+                    .Include(s => s.Teacher)
                     .OrderBy(s => s.DayOfWeek)
                     .ThenBy(s => s.StartTime)
                     .ToListAsync();
@@ -50,16 +57,14 @@ namespace AuthApp.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            await PopulateCourseLookups();
-            PopulateDayOfWeekOptions();
-            PopulateClassTypeOptions();
-            PopulateStatusOptions();
+            await PopulateScheduleLookups();
 
+            var defaultSlot = StandardTimeSlots.First();
             return View(new Schedule
             {
                 Status = "Active",
-                StartTime = new TimeSpan(8, 0, 0),
-                EndTime = new TimeSpan(9, 30, 0)
+                StartTime = defaultSlot.Start,
+                EndTime = defaultSlot.End
             });
         }
 
@@ -69,46 +74,47 @@ namespace AuthApp.Controllers
         {
             if (!ModelState.IsValid)
             {
-                await PopulateCourseLookups();
-                PopulateDayOfWeekOptions();
-                PopulateClassTypeOptions();
-                PopulateStatusOptions();
+                await PopulateScheduleLookups(model.CourseId, model.TeacherId);
                 return View(model);
             }
 
             if (model.EndTime <= model.StartTime)
             {
                 ModelState.AddModelError(nameof(Schedule.EndTime), "End time must be after start time.");
-                await PopulateCourseLookups();
-                PopulateDayOfWeekOptions();
-                PopulateClassTypeOptions();
-                PopulateStatusOptions();
+                await PopulateScheduleLookups(model.CourseId, model.TeacherId);
                 return View(model);
             }
 
-            model.CreatedAt = DateTime.UtcNow;
-            _context.Schedules.Add(model);
-            await _context.SaveChangesAsync();
-
-            // Check if any teachers are assigned to this course
-            var assignedTeachers = await _context.CourseAssignments
-                .Where(ca => ca.CourseId == model.CourseId && ca.Status == "Active")
-                .Include(ca => ca.Teacher)
-                .Select(ca => ca.Teacher.FullName)
-                .ToListAsync();
-
-            var message = "Schedule created successfully.";
-            if (assignedTeachers.Any())
+            try
             {
-                message += $" Teachers assigned to this course ({string.Join(", ", assignedTeachers)}) will now see this schedule in their weekly view.";
-            }
-            else
-            {
-                message += " Note: No teachers are currently assigned to this course. Assign a teacher via Course Assignment for them to see this schedule.";
-            }
+                model.CreatedAt = DateTime.UtcNow;
+                _context.Schedules.Add(model);
+                await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = message;
-            return RedirectToAction(nameof(Index));
+                var teacherName = await _context.Teachers
+                    .Where(t => t.Id == model.TeacherId)
+                    .Select(t => t.FullName)
+                    .FirstOrDefaultAsync();
+
+                var isTeacherAssignedToCourse = await _context.CourseAssignments
+                    .AnyAsync(ca => ca.CourseId == model.CourseId && ca.TeacherId == model.TeacherId && ca.Status == "Active");
+
+                var message = $"Schedule created successfully for {(teacherName ?? "the selected teacher")}.";
+                if (!isTeacherAssignedToCourse)
+                {
+                    message += " Note: this teacher is not yet linked to the course via Course Assignment.";
+                }
+
+                TempData["SuccessMessage"] = message;
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateException ex)
+            {
+                var message = ex.InnerException?.Message ?? ex.Message;
+                ModelState.AddModelError(string.Empty, $"Could not save schedule: {message}");
+                await PopulateScheduleLookups(model.CourseId, model.TeacherId);
+                return View(model);
+            }
         }
 
         // Edit schedule
@@ -126,10 +132,7 @@ namespace AuthApp.Controllers
                 return NotFound();
             }
 
-            await PopulateCourseLookups();
-            PopulateDayOfWeekOptions();
-            PopulateClassTypeOptions();
-            PopulateStatusOptions();
+            await PopulateScheduleLookups(schedule.CourseId, schedule.TeacherId);
 
             return View(schedule);
         }
@@ -145,20 +148,14 @@ namespace AuthApp.Controllers
 
             if (!ModelState.IsValid)
             {
-                await PopulateCourseLookups();
-                PopulateDayOfWeekOptions();
-                PopulateClassTypeOptions();
-                PopulateStatusOptions();
+                await PopulateScheduleLookups(model.CourseId, model.TeacherId);
                 return View(model);
             }
 
             if (model.EndTime <= model.StartTime)
             {
                 ModelState.AddModelError(nameof(Schedule.EndTime), "End time must be after start time.");
-                await PopulateCourseLookups();
-                PopulateDayOfWeekOptions();
-                PopulateClassTypeOptions();
-                PopulateStatusOptions();
+                await PopulateScheduleLookups(model.CourseId, model.TeacherId);
                 return View(model);
             }
 
@@ -169,6 +166,7 @@ namespace AuthApp.Controllers
             }
 
             schedule.CourseId = model.CourseId;
+            schedule.TeacherId = model.TeacherId;
             schedule.DayOfWeek = model.DayOfWeek;
             schedule.StartTime = model.StartTime;
             schedule.EndTime = model.EndTime;
@@ -196,6 +194,7 @@ namespace AuthApp.Controllers
 
             var schedule = await _context.Schedules
                 .Include(s => s.Course)
+                .Include(s => s.Teacher)
                 .FirstOrDefaultAsync(s => s.Id == id);
 
             if (schedule == null)
@@ -223,13 +222,32 @@ namespace AuthApp.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private async Task PopulateCourseLookups()
+        private async Task PopulateCourseLookups(int? selectedCourseId = null)
         {
             ViewBag.Courses = await _context.Courses
-                .Where(c => c.Status == "Active")
+                .Where(c => c.Status == "Active" || (selectedCourseId != null && c.Id == selectedCourseId))
                 .OrderBy(c => c.CourseCode)
                 .Select(c => new SelectListItem($"{c.CourseCode} - {c.CourseName}", c.Id.ToString()))
                 .ToListAsync();
+        }
+
+        private async Task PopulateTeacherLookups(int? selectedTeacherId = null)
+        {
+            ViewBag.Teachers = await _context.Teachers
+                .Where(t => t.Status == "Active" || (selectedTeacherId != null && t.Id == selectedTeacherId))
+                .OrderBy(t => t.FullName)
+                .Select(t => new SelectListItem($"{t.FullName} ({t.TeacherCode})", t.Id.ToString()))
+                .ToListAsync();
+        }
+
+        private async Task PopulateScheduleLookups(int? selectedCourseId = null, int? selectedTeacherId = null)
+        {
+            await PopulateCourseLookups(selectedCourseId);
+            await PopulateTeacherLookups(selectedTeacherId);
+            PopulateDayOfWeekOptions();
+            PopulateClassTypeOptions();
+            PopulateStatusOptions();
+            PopulateTimeSlotOptions();
         }
 
         private void PopulateDayOfWeekOptions()
@@ -266,6 +284,32 @@ namespace AuthApp.Controllers
                 new SelectListItem("Inactive", "Inactive")
             };
         }
+
+        private void PopulateTimeSlotOptions()
+        {
+            ViewBag.TimeSlotOptions = StandardTimeSlots
+                .Select(slot => new SelectListItem(
+                    $"{slot.Start:hh\\:mm} - {slot.End:hh\\:mm}",
+                    $"{slot.Start:hh\\:mm}-{slot.End:hh\\:mm}"))
+                .ToList();
+        }
+
+        private static IReadOnlyList<(TimeSpan Start, TimeSpan End)> BuildTimeSlots()
+        {
+            var slots = new List<(TimeSpan, TimeSpan)>();
+            var currentStart = SlotStartTime;
+            for (var i = 0; i < SlotsPerDay; i++)
+            {
+                var endTime = currentStart + SlotDuration;
+                slots.Add((currentStart, endTime));
+                currentStart = endTime + SlotGap;
+            }
+
+            return slots;
+        }
+
+        // Time slots are suggested in the UI but not strictly enforced on the server.
+        // As long as EndTime > StartTime, the schedule is accepted.
     }
 }
 

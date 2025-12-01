@@ -26,6 +26,11 @@
                     <strong>@Model.Course?.CourseCode</strong> - @Model.Course?.CourseName
                 </dd>
 
+                <dt class="col-sm-3">Teacher:</dt>
+                <dd class="col-sm-9">
+                    <strong>@Model.Teacher?.FullName</strong> (@Model.Teacher?.TeacherCode)
+                </dd>
+
                 <dt class="col-sm-3">Day of Week:</dt>
                 <dd class="col-sm-9">@Model.DayOfWeek</dd>
 

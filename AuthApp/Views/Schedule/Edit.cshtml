@@ -1,4 +1,10 @@
 @model AuthApp.Models.Schedule
+@using Microsoft.AspNetCore.Mvc.Rendering
+@using System.Linq
+
+@{
+    var timeSlots = ViewBag.TimeSlotOptions as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>();
+}
 
 @{
     ViewData["Title"] = "Edit Schedule";
@@ -30,11 +36,33 @@
                     </div>
 
                     <div class="col-md-6 mb-3">
+                        <label asp-for="TeacherId" class="form-label">Teacher <span class="text-danger">*</span></label>
+                        <select asp-for="TeacherId" class="form-select" asp-items="ViewBag.Teachers">
+                            <option value="">-- Select Teacher --</option>
+                        </select>
+                        <span asp-validation-for="TeacherId" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
                         <label asp-for="DayOfWeek" class="form-label">Day of Week <span class="text-danger">*</span></label>
                         <select asp-for="DayOfWeek" class="form-select" asp-items="ViewBag.DayOfWeekOptions">
                             <option value="">-- Select Day --</option>
                         </select>
                         <span asp-validation-for="DayOfWeek" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Time Slot</label>
+                        <select id="timeSlotSelect" class="form-select">
+                            <option value="">-- Select Time Slot --</option>
+                            @foreach (var slot in timeSlots)
+                            {
+                                <option value="@slot.Value">@slot.Text</option>
+                            }
+                        </select>
+                        <small class="form-text text-muted">Selecting a slot will autofill the times.</small>
                     </div>
                 </div>
 
@@ -95,5 +123,34 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        const editTimeSlotSelect = document.getElementById('timeSlotSelect');
+        const editStartInput = document.getElementById('StartTime');
+        const editEndInput = document.getElementById('EndTime');
+
+        if (editTimeSlotSelect && editStartInput && editEndInput) {
+            editTimeSlotSelect.addEventListener('change', function () {
+                const selectedSlot = this.value;
+                if (!selectedSlot) {
+                    return;
+                }
+                const times = selectedSlot.split('-');
+                if (times.length === 2) {
+                    editStartInput.value = times[0].trim();
+                    editEndInput.value = times[1].trim();
+                }
+            });
+
+            function syncSlotSelection() {
+                const slotValue = (editStartInput.value?.substring(0, 5) ?? '') + '-' + (editEndInput.value?.substring(0, 5) ?? '');
+                const option = Array.from(editTimeSlotSelect.options).find(opt => opt.value === slotValue);
+                editTimeSlotSelect.value = option ? slotValue : '';
+            }
+
+            editStartInput.addEventListener('change', syncSlotSelection);
+            editEndInput.addEventListener('change', syncSlotSelection);
+            syncSlotSelection();
+        }
+    </script>
 }
 
