@@ -194,6 +194,13 @@ namespace AuthApp.Data
                     .WithMany(t => t.Schedules)
                     .HasForeignKey(x => x.TeacherId)
                     .OnDelete(DeleteBehavior.Cascade);
+
+                // Optional link to a specific student. If the student is deleted, keep the schedule
+                // but clear the StudentId so that it no longer belongs to that student.
+                e.HasOne(x => x.Student)
+                    .WithMany(s => s.Schedules)
+                    .HasForeignKey(x => x.StudentId)
+                    .OnDelete(DeleteBehavior.SetNull);
             });
 
             base.OnModelCreating(modelBuilder);

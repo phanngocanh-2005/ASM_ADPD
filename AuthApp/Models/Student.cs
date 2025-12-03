@@ -56,6 +56,9 @@ namespace AuthApp.Models
         public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
 
         public ICollection<AcademicRecord> AcademicRecords { get; set; } = new List<AcademicRecord>();
+
+        // Schedules that are assigned specifically to this student (optional).
+        public ICollection<Schedule> Schedules { get; set; } = new List<Schedule>();
     }
 }
 

@@ -143,7 +143,8 @@ namespace AuthApp.Controllers
             await _context.SaveChangesAsync();
 
             TempData["SuccessMessage"] = "Your student profile has been created successfully.";
-            return RedirectToAction(nameof(Profile));
+            // Sau khi tạo profile thành công, đưa sinh viên về trang StudentHome (Index)
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpGet]

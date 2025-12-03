@@ -1,4 +1,4 @@
-@model List<AuthApp.Models.Course>
+@model List<AuthApp.Models.ViewModels.CourseInlineGradeViewModel>
 
 @{
     ViewData["Title"] = "Grade Management";
@@ -43,27 +43,63 @@
                             <tr>
                                 <th>Course Code</th>
                                 <th>Course Name</th>
-                                <th>Credits</th>
-                                <th>Semester</th>
-                                <th>Academic Year</th>
-                                <th class="text-center">Actions</th>
+                                <th style="width: 260px;">Student</th>
+                                <th style="width: 300px;">Grade (0 - 100)</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var course in Model)
                             {
                                 <tr>
-                                    <td><strong class="text-primary">@course.CourseCode</strong></td>
+                                    <td>
+                                        <strong class="text-primary">@course.CourseCode</strong>
+                                    </td>
                                     <td>@course.CourseName</td>
                                     <td>
-                                        <span class="badge bg-info">@course.Credits</span>
+                                        @if (course.Students != null && course.Students.Any())
+                                        {
+                                            <select class="form-select form-select-sm student-select"
+                                                    data-course-id="@course.CourseId">
+                                                <option value="">-- Select Student --</option>
+                                                @foreach (var s in course.Students)
+                                                {
+                                                    <option value="@s.StudentId"
+                                                            data-grade="@(s.Grade.HasValue ? s.Grade.Value.ToString("0.##") : "")">
+                                                        @s.StudentCode - @s.StudentName@(s.Grade.HasValue ? $" (Grade: {s.Grade.Value:F2})" : "")
+                                                    </option>
+                                                }
+                                            </select>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">No enrolled students</span>
+                                        }
                                     </td>
-                                    <td>@(course.Semester?.ToString() ?? "N/A")</td>
-                                    <td>@(course.AcademicYear ?? "N/A")</td>
-                                    <td class="text-center">
-                                        <a asp-action="GradeStudents" asp-route-courseId="@course.Id" class="btn btn-sm btn-primary">
-                                            <i class="fas fa-edit"></i> Manage Grades
-                                        </a>
+                                    <td>
+                                        @if (course.Students != null && course.Students.Any())
+                                        {
+                                            <form asp-action="SaveInlineGrade" method="post" class="d-flex align-items-center gap-2 inline-grade-form">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="courseId" value="@course.CourseId" />
+                                                <input type="hidden" name="studentId" value="" class="selected-student-id" />
+                                                <input type="number"
+                                                       name="grade"
+                                                       class="form-control form-control-sm grade-input"
+                                                       min="0" max="100" step="0.01"
+                                                       placeholder="0 - 100"
+                                                       disabled />
+                                                <button type="button" class="btn btn-sm btn-warning edit-grade-btn" disabled>
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </button>
+                                                <button type="submit" class="btn btn-sm btn-primary save-grade-btn" style="display: none;">
+                                                    <i class="fas fa-save"></i> Save
+                                                </button>
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">N/A</span>
+                                        }
                                     </td>
                                 </tr>
                             }
@@ -74,39 +110,98 @@
             else
             {
                 <div class="alert alert-info mb-0">
-                    <i class="fas fa-info-circle"></i> You are not currently assigned to teach any courses.
+                    <i class="fas fa-info-circle"></i> You are not currently assigned to teach any courses or there are no enrolled students.
                 </div>
             }
         </div>
     </div>
 
-    @if (Model != null && Model.Any())
-    {
-        <div class="row g-3 mt-4">
-            <div class="col-md-4">
-                <div class="card shadow-sm border-primary">
-                    <div class="card-body text-center">
-                        <h3 class="text-primary mb-0">@Model.Count</h3>
-                        <small class="text-muted">Total Courses</small>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card shadow-sm border-success">
-                    <div class="card-body text-center">
-                        <h3 class="text-success mb-0">@Model.Sum(c => c.Credits)</h3>
-                        <small class="text-muted">Total Credits</small>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card shadow-sm border-info">
-                    <div class="card-body text-center">
-                        <h3 class="text-info mb-0">@Model.Select(c => c.AcademicYear).Distinct().Count()</h3>
-                        <small class="text-muted">Academic Years</small>
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
 </div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        // Function để xử lý khi chọn student
+        function handleStudentSelect(select) {
+            var selectedOption = select.options[select.selectedIndex];
+            var studentId = selectedOption.value || '';
+            var grade = selectedOption.getAttribute('data-grade');
+
+            var row = select.closest('tr');
+            var gradeForm = row.querySelector('.inline-grade-form');
+            
+            if (gradeForm) {
+                var gradeStudentInput = gradeForm.querySelector('.selected-student-id');
+                var gradeInput = gradeForm.querySelector('.grade-input');
+                var editBtn = gradeForm.querySelector('.edit-grade-btn');
+                var saveBtn = gradeForm.querySelector('.save-grade-btn');
+                
+                gradeStudentInput.value = studentId;
+                
+                if (studentId) {
+                    // Fill điểm vào input nếu có
+                    if (grade && grade !== '' && grade !== 'null') {
+                        gradeInput.value = grade;
+                    } else {
+                        gradeInput.value = '';
+                    }
+                    gradeInput.disabled = true;
+                    editBtn.disabled = false; // Enable nút Edit khi đã chọn student
+                    editBtn.style.display = 'inline-block';
+                    saveBtn.style.display = 'none';
+                } else {
+                    gradeInput.value = '';
+                    gradeInput.disabled = true;
+                    editBtn.disabled = true; // Disable nút Edit khi chưa chọn student
+                    editBtn.style.display = 'inline-block';
+                    saveBtn.style.display = 'none';
+                }
+            }
+        }
+
+        // Khi chọn student trong dropdown, gán StudentId vào form và auto-fill điểm hiện tại
+        document.querySelectorAll('.student-select').forEach(function (select) {
+            select.addEventListener('change', function () {
+                handleStudentSelect(this);
+            });
+        });
+
+        // Sau khi Save thành công, tự động chọn lại student và hiển thị điểm mới
+        @if (TempData["LastSavedCourseId"] != null && TempData["LastSavedStudentId"] != null)
+        {
+            var savedCourseId = TempData["LastSavedCourseId"].ToString();
+            var savedStudentId = TempData["LastSavedStudentId"].ToString();
+            <text>
+            document.addEventListener('DOMContentLoaded', function() {
+                var courseId = '@savedCourseId';
+                var studentId = '@savedStudentId';
+                
+                // Tìm dropdown student trong row có courseId tương ứng
+                document.querySelectorAll('.student-select').forEach(function(select) {
+                    var rowCourseId = select.getAttribute('data-course-id');
+                    if (rowCourseId == courseId) {
+                        // Chọn student đã Save
+                        select.value = studentId;
+                        // Trigger change event để fill điểm
+                        handleStudentSelect(select);
+                    }
+                });
+            });
+            </text>
+        }
+
+        // Khi bấm Edit, enable input và hiện nút Save, ẩn nút Edit
+        document.querySelectorAll('.edit-grade-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var form = this.closest('.inline-grade-form');
+                var gradeInput = form.querySelector('.grade-input');
+                var saveBtn = form.querySelector('.save-grade-btn');
+                
+                gradeInput.disabled = false;
+                gradeInput.focus();
+                this.style.display = 'none';
+                saveBtn.style.display = 'inline-block';
+            });
+        });
+    </script>
+}

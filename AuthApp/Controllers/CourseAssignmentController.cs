@@ -37,14 +37,7 @@ namespace AuthApp.Controllers
         // Hiển thị form tạo mới phân công môn học
         public async Task<IActionResult> Create()
         {
-            ViewBag.Teachers = await _context.Teachers
-                .Where(t => t.Status == "Active")
-                .OrderBy(t => t.FullName)
-                .ToListAsync();
-            ViewBag.Courses = await _context.Courses
-                .Where(c => c.Status == "Active")
-                .OrderBy(c => c.CourseCode)
-                .ToListAsync();
+            await PopulateAssignmentLookups();
             return View();
         }
 
@@ -81,15 +74,130 @@ namespace AuthApp.Controllers
                 }
             }
 
+            await PopulateAssignmentLookups(assignment.TeacherId, assignment.CourseId);
+            return View(assignment);
+        }
+
+        // Hiển thị form chỉnh sửa một phân công môn học
+        [HttpGet]
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var assignment = await _context.CourseAssignments
+                .Include(ca => ca.Teacher)
+                .Include(ca => ca.Course)
+                .FirstOrDefaultAsync(ca => ca.Id == id);
+
+            if (assignment == null)
+            {
+                return NotFound();
+            }
+
+            await PopulateAssignmentLookups(assignment.TeacherId, assignment.CourseId);
+            return View(assignment);
+        }
+
+        // Xử lý submit chỉnh sửa phân công môn học
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("Id,TeacherId,CourseId,Status")] CourseAssignment model)
+        {
+            if (id != model.Id)
+            {
+                return NotFound();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                await PopulateAssignmentLookups(model.TeacherId, model.CourseId);
+                return View(model);
+            }
+
+            var existing = await _context.CourseAssignments.FindAsync(id);
+            if (existing == null)
+            {
+                return NotFound();
+            }
+
+            existing.TeacherId = model.TeacherId;
+            existing.CourseId = model.CourseId;
+            existing.Status = model.Status;
+
+            try
+            {
+                _context.Update(existing);
+                await _context.SaveChangesAsync();
+
+                var notification = NotificationFactory.CreateSuccess("Course assignment updated successfully.");
+                TempData["SuccessMessage"] = notification.Message;
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateException ex)
+            {
+                var error = NotificationFactory.CreateError(ex.InnerException?.Message ?? ex.Message);
+                ModelState.AddModelError(string.Empty, $"Could not update course assignment: {error.Message}");
+                await PopulateAssignmentLookups(model.TeacherId, model.CourseId);
+                return View(model);
+            }
+        }
+
+        // Hiển thị xác nhận xóa phân công môn học
+        [HttpGet]
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var assignment = await _context.CourseAssignments
+                .Include(ca => ca.Teacher)
+                .Include(ca => ca.Course)
+                .FirstOrDefaultAsync(ca => ca.Id == id);
+
+            if (assignment == null)
+            {
+                return NotFound();
+            }
+
+            return View(assignment);
+        }
+
+        // Xử lý xóa phân công môn học
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var assignment = await _context.CourseAssignments.FindAsync(id);
+            if (assignment == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            _context.CourseAssignments.Remove(assignment);
+            await _context.SaveChangesAsync();
+
+            var notification = NotificationFactory.CreateSuccess("Course assignment deleted successfully.");
+            TempData["SuccessMessage"] = notification.Message;
+            return RedirectToAction(nameof(Index));
+        }
+
+        // Load danh sách Teacher / Course cho các dropdown của CourseAssignment
+        private async Task PopulateAssignmentLookups(int? selectedTeacherId = null, int? selectedCourseId = null)
+        {
             ViewBag.Teachers = await _context.Teachers
-                .Where(t => t.Status == "Active")
+                .Where(t => t.Status == "Active" || (selectedTeacherId != null && t.Id == selectedTeacherId))
                 .OrderBy(t => t.FullName)
                 .ToListAsync();
+
             ViewBag.Courses = await _context.Courses
-                .Where(c => c.Status == "Active")
+                .Where(c => c.Status == "Active" || (selectedCourseId != null && c.Id == selectedCourseId))
                 .OrderBy(c => c.CourseCode)
                 .ToListAsync();
-            return View(assignment);
         }
     }
 }

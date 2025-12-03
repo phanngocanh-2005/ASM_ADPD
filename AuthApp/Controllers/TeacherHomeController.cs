@@ -125,16 +125,11 @@ namespace AuthApp.Controllers
                     return RedirectToAction("Index", "TeacherHome");
                 }
 
-                // Get all courses assigned to this teacher
-                var assignedCourseIds = await _context.CourseAssignments
-                    .Where(ca => ca.TeacherId == teacherId && ca.Status == "Active")
-                    .Select(ca => ca.CourseId)
-                    .ToListAsync();
-
-                // Get all schedules for assigned courses
+                // Load schedules directly from Schedule Management table,
+                // filtered by the current teacher and active status.
                 var schedules = await _context.Schedules
                     .Include(s => s.Course)
-                    .Where(s => assignedCourseIds.Contains(s.CourseId) && s.Status == "Active")
+                    .Where(s => s.TeacherId == teacherId && s.Status == "Active")
                     .OrderBy(s => s.DayOfWeek)
                     .ThenBy(s => s.StartTime)
                     .ToListAsync();

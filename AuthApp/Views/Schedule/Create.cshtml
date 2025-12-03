@@ -46,6 +46,19 @@
 
                 <div class="row">
                     <div class="col-md-6 mb-3">
+                        <label asp-for="StudentId" class="form-label fw-bold">Student</label>
+                        <select asp-for="StudentId" class="form-select" asp-items="ViewBag.Students">
+                            <option value="">-- Optional: Select Student --</option>
+                        </select>
+                        <span asp-validation-for="StudentId" class="text-danger"></span>
+                        <small class="form-text text-muted">
+                            Leave empty to apply this schedule to all students enrolled in the course.
+                        </small>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
                         <label asp-for="DayOfWeek" class="form-label fw-bold">Day of Week <span class="text-danger">*</span></label>
                         <select asp-for="DayOfWeek" class="form-select" asp-items="ViewBag.DayOfWeekOptions" required>
                             <option value="">-- Select Day --</option>

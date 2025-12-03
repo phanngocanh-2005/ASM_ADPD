@@ -79,7 +79,7 @@ namespace AuthApp.Controllers
             // Nếu model không hợp lệ (thiếu dữ liệu, sai kiểu, ...)
             if (!ModelState.IsValid)
             {
-                await PopulateScheduleLookups(model.CourseId, model.TeacherId);
+                await PopulateScheduleLookups(model.CourseId, model.TeacherId, model.StudentId);
                 return View(model);
             }
 
@@ -87,7 +87,7 @@ namespace AuthApp.Controllers
             if (model.EndTime <= model.StartTime)
             {
                 ModelState.AddModelError(nameof(Schedule.EndTime), "End time must be after start time.");
-                await PopulateScheduleLookups(model.CourseId, model.TeacherId);
+                await PopulateScheduleLookups(model.CourseId, model.TeacherId, model.StudentId);
                 return View(model);
             }
 
@@ -124,7 +124,7 @@ namespace AuthApp.Controllers
             {
                 var error = NotificationFactory.CreateError(ex.InnerException?.Message ?? ex.Message);
                 ModelState.AddModelError(string.Empty, $"Could not save schedule: {error.Message}");
-                await PopulateScheduleLookups(model.CourseId, model.TeacherId);
+                await PopulateScheduleLookups(model.CourseId, model.TeacherId, model.StudentId);
                 return View(model);
             }
         }
@@ -144,7 +144,7 @@ namespace AuthApp.Controllers
                 return NotFound();
             }
 
-            await PopulateScheduleLookups(schedule.CourseId, schedule.TeacherId);
+            await PopulateScheduleLookups(schedule.CourseId, schedule.TeacherId, schedule.StudentId);
 
             return View(schedule);
         }
@@ -160,14 +160,14 @@ namespace AuthApp.Controllers
 
             if (!ModelState.IsValid)
             {
-                await PopulateScheduleLookups(model.CourseId, model.TeacherId);
+                await PopulateScheduleLookups(model.CourseId, model.TeacherId, model.StudentId);
                 return View(model);
             }
 
             if (model.EndTime <= model.StartTime)
             {
                 ModelState.AddModelError(nameof(Schedule.EndTime), "End time must be after start time.");
-                await PopulateScheduleLookups(model.CourseId, model.TeacherId);
+                await PopulateScheduleLookups(model.CourseId, model.TeacherId, model.StudentId);
                 return View(model);
             }
 
@@ -179,6 +179,7 @@ namespace AuthApp.Controllers
 
             schedule.CourseId = model.CourseId;
             schedule.TeacherId = model.TeacherId;
+            schedule.StudentId = model.StudentId;
             schedule.DayOfWeek = model.DayOfWeek;
             schedule.StartTime = model.StartTime;
             schedule.EndTime = model.EndTime;
@@ -252,14 +253,24 @@ namespace AuthApp.Controllers
             ViewBag.Teachers = _teacherAdapter.Adapt(teachers).ToList();
         }
 
-        private async Task PopulateScheduleLookups(int? selectedCourseId = null, int? selectedTeacherId = null)
+        private async Task PopulateScheduleLookups(int? selectedCourseId = null, int? selectedTeacherId = null, int? selectedStudentId = null)
         {
             await PopulateCourseLookups(selectedCourseId);
             await PopulateTeacherLookups(selectedTeacherId);
+            await PopulateStudentLookups(selectedStudentId);
             PopulateDayOfWeekOptions();
             PopulateClassTypeOptions();
             PopulateStatusOptions();
             PopulateTimeSlotOptions();
+        }
+
+        private async Task PopulateStudentLookups(int? selectedStudentId = null)
+        {
+            ViewBag.Students = await _context.Students
+                .Where(s => s.Status == "Active" || (selectedStudentId != null && s.Id == selectedStudentId))
+                .OrderBy(s => s.StudentCode)
+                .Select(s => new SelectListItem($"{s.StudentCode} - {s.FullName}", s.Id.ToString()))
+                .ToListAsync();
         }
 
         private void PopulateDayOfWeekOptions()

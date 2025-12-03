@@ -16,6 +16,10 @@ namespace AuthApp.Models
         [Required]
         public int TeacherId { get; set; }
 
+        // Optional: if set, this schedule is specific to a single student.
+        // If null, the schedule applies to all enrolled students of the course.
+        public int? StudentId { get; set; }
+
         [Required]
         [StringLength(20)]
         public string DayOfWeek { get; set; } = string.Empty; // Monday, Tuesday, etc.
@@ -44,8 +48,9 @@ namespace AuthApp.Models
         public DateTime? UpdatedAt { get; set; }
 
         // Navigation properties
-        public Course Course { get; set; } = null!;
-        public Teacher Teacher { get; set; } = null!;
+        public Course? Course { get; set; }
+        public Teacher? Teacher { get; set; }
+        public Student? Student { get; set; }
     }
 }
 

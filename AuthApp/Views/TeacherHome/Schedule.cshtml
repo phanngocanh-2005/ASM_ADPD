@@ -30,124 +30,61 @@
         </div>
     }
 
-    <!-- Weekly Schedule Table -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0"><i class="fas fa-calendar-week"></i> Weekly Teaching Schedule</h5>
-        </div>
-        <div class="card-body">
-            @if (Model != null && Model.Any())
-            {
+    @if (Model != null && Model.Any())
+    {
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-calendar-week"></i> Weekly Teaching Schedule
+                </h5>
+            </div>
+            <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-hover">
+                    <table class="table table-hover">
                         <thead class="table-light">
                             <tr>
-                                <th style="width: 10%;" class="text-center">Time</th>
-                                <th style="width: 12.8%;" class="text-center">Monday</th>
-                                <th style="width: 12.8%;" class="text-center">Tuesday</th>
-                                <th style="width: 12.8%;" class="text-center">Wednesday</th>
-                                <th style="width: 12.8%;" class="text-center">Thursday</th>
-                                <th style="width: 12.8%;" class="text-center">Friday</th>
-                                <th style="width: 12.8%;" class="text-center">Saturday</th>
-                                <th style="width: 12.8%;" class="text-center">Sunday</th>
+                                <th>Course</th>
+                                <th>Day of Week</th>
+                                <th>Time</th>
+                                <th>Room</th>
+                                <th>Building</th>
+                                <th>Class Type</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @{
-                                var daysOfWeek = new[] { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
-                                // Generate 6 time slots: 7:00-7:10, 7:10-7:20, 7:20-7:30, 7:30-7:40, 7:40-7:50, 7:50-8:00
-                                var timeSlots = new List<(TimeSpan Start, TimeSpan End)>();
-                                for (int i = 0; i < 6; i++)
-                                {
-                                    var startMinutes = 7 * 60 + i * 10; // Start from 7:00, add 10 minutes for each slot
-                                    var endMinutes = startMinutes + 10;
-                                    var start = new TimeSpan(0, startMinutes, 0);
-                                    var end = new TimeSpan(0, endMinutes, 0);
-                                    timeSlots.Add((start, end));
-                                }
-                            }
-                            @foreach (var timeSlot in timeSlots)
+                            @foreach (var schedule in Model)
                             {
                                 <tr>
-                                    <td class="fw-bold text-center bg-light">
-                                        @timeSlot.Start.ToString(@"hh\:mm")<br />
-                                        <small class="text-muted">@timeSlot.End.ToString(@"hh\:mm")</small>
+                                    <td>
+                                        <strong>@schedule.Course?.CourseCode</strong>
+                                        <br />
+                                        <small class="text-muted">@schedule.Course?.CourseName</small>
                                     </td>
-                                    @foreach (var day in daysOfWeek)
-                                    {
-                                        var schedule = Model?.FirstOrDefault(s => 
-                                            s.DayOfWeek == day && 
-                                            s.StartTime == timeSlot.Start && 
-                                            s.EndTime == timeSlot.End);
-                                        <td style="min-height: 80px; vertical-align: middle;">
-                                            @if (schedule != null)
-                                            {
-                                                <div class="p-2 bg-light rounded border border-primary">
-                                                    <strong class="text-primary d-block">@schedule.Course?.CourseCode</strong>
-                                                    <small class="d-block text-muted">@schedule.Course?.CourseName</small>
-                                                    @if (!string.IsNullOrEmpty(schedule.Room))
-                                                    {
-                                                        <small class="text-muted d-block mt-1">
-                                                            <i class="fas fa-door-open"></i> Room: @schedule.Room
-                                                        </small>
-                                                    }
-                                                    else
-                                                    {
-                                                        <small class="text-muted d-block mt-1">Room: -</small>
-                                                    }
-                                                </div>
-                                            }
-                                            else
-                                            {
-                                                <div class="p-2 text-center text-muted" style="min-height: 60px;">
-                                                    <small>-</small>
-                                                </div>
-                                            }
-                                        </td>
-                                    }
+                                    <td>@schedule.DayOfWeek</td>
+                                    <td>
+                                        @schedule.StartTime.ToString(@"hh\:mm") - @schedule.EndTime.ToString(@"hh\:mm")
+                                    </td>
+                                    <td>@(schedule.Room ?? "-")</td>
+                                    <td>@(schedule.Building ?? "-")</td>
+                                    <td>@(schedule.ClassType ?? "-")</td>
+                                    <td>
+                                        <span class="badge @(schedule.Status == "Active" ? "bg-success" : "bg-secondary")">
+                                            @schedule.Status
+                                        </span>
+                                    </td>
                                 </tr>
                             }
                         </tbody>
                     </table>
                 </div>
-            }
-            else
-            {
-                <div class="alert alert-info mb-0">
-                    <i class="fas fa-info-circle"></i> No teaching schedule found. Please contact the administrator if you believe this is an error.
-                </div>
-            }
+            </div>
         </div>
-    </div>
-
-    <!-- Schedule Summary -->
-    @if (Model != null && Model.Any())
+    }
+    else
     {
-        <div class="row g-3">
-            <div class="col-md-4">
-                <div class="card shadow-sm border-primary">
-                    <div class="card-body text-center">
-                        <h3 class="text-primary mb-0">@Model.Count()</h3>
-                        <small class="text-muted">Total Classes per Week</small>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card shadow-sm border-success">
-                    <div class="card-body text-center">
-                        <h3 class="text-success mb-0">@Model.Select(s => s.CourseId).Distinct().Count()</h3>
-                        <small class="text-muted">Total Courses</small>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card shadow-sm border-info">
-                    <div class="card-body text-center">
-                        <h3 class="text-info mb-0">@Model.Select(s => s.DayOfWeek).Distinct().Count()</h3>
-                        <small class="text-muted">Days with Classes</small>
-                    </div>
-                </div>
-            </div>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> No teaching schedule found. Please contact the administrator if you believe this is an error.
         </div>
     }
 </div>
