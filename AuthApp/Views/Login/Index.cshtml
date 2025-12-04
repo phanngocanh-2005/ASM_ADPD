@@ -9,6 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login - AuthApp</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 </head>
 <body>
 <style>
@@ -76,8 +77,29 @@
         transition: 0.25s;
     }
 
-        .btn-btec:hover {
-            background: var(--btec-orange-dark);
+    .btn-btec:hover {
+        background: var(--btec-orange-dark);
+        transform: translateY(-2px);
+    }
+
+    .btn-back {
+        background: transparent;
+        border: 2px solid var(--btec-orange);
+        color: var(--btec-orange);
+        font-weight: bold;
+        border-radius: 8px;
+        padding: 10px;
+        width: 100%;
+        margin-top: 10px;
+        transition: 0.25s;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+    }
+
+        .btn-back:hover {
+            background: var(--btec-orange);
+            color: white;
             transform: translateY(-2px);
         }
 
@@ -126,6 +148,10 @@
                 Login
             </button>
         </form>
+
+        <a href="@Url.Action("Index", "Home")" class="btn-back">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
 
     </div>
 </div>

@@ -2,6 +2,7 @@
 using AuthApp.Models;
 using AuthApp.Models.ViewModels;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -281,9 +282,12 @@ namespace AuthApp.Controllers
             _context.Students.Remove(student);
             await _context.SaveChangesAsync();
 
+            // Sign out và clear session đúng cách
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            HttpContext.Session.Clear();
+
             TempData["SuccessMessage"] = "Your profile has been deleted successfully.";
-            await HttpContext.SignOutAsync();
-            return RedirectToAction("Index", "Login");
+            return RedirectToAction("Index", "Home");
         }
 
         [HttpGet]

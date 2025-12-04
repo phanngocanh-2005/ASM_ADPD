@@ -45,15 +45,19 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="StudentId" class="form-label fw-bold">Student</label>
-                        <select asp-for="StudentId" class="form-select" asp-items="ViewBag.Students">
-                            <option value="">-- Optional: Select Student --</option>
-                        </select>
-                        <span asp-validation-for="StudentId" class="text-danger"></span>
+                    <div class="col-md-12 mb-3">
+                        <label class="form-label fw-bold">Enroll Students to Course</label>
+                        <div class="input-group mb-2">
+                            <input type="text" id="studentCodeInput" class="form-control" placeholder="Enter student code (e.g., SV001)" />
+                            <button type="button" class="btn btn-primary" id="addStudentBtn">
+                                <i class="fas fa-plus"></i> Add Student
+                            </button>
+                        </div>
                         <small class="form-text text-muted">
-                            Leave empty to apply this schedule to all students enrolled in the course.
+                            Enter student codes to automatically enroll them in this course. You can add multiple students.
                         </small>
+                        <div id="studentList" class="mt-3"></div>
+                        <input type="hidden" name="StudentCodes" id="studentCodesInput" />
                     </div>
                 </div>
 
@@ -171,5 +175,136 @@
 
         document.getElementById('startTime').addEventListener('change', updateTimeSlot);
         document.getElementById('endTime').addEventListener('change', updateTimeSlot);
+
+        // Student enrollment functionality
+        var enrolledStudents = [];
+        var studentCodeInput = document.getElementById('studentCodeInput');
+        var addStudentBtn = document.getElementById('addStudentBtn');
+        var studentList = document.getElementById('studentList');
+        var studentCodesInput = document.getElementById('studentCodesInput');
+
+        // Search student when typing
+        var searchTimeout;
+        studentCodeInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            var code = this.value.trim();
+            
+            if (code.length >= 2) {
+                searchTimeout = setTimeout(function() {
+                    searchStudent(code);
+                }, 300);
+            } else {
+                hideStudentInfo();
+            }
+        });
+
+        // Add student when button clicked or Enter pressed
+        addStudentBtn.addEventListener('click', addStudent);
+        studentCodeInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addStudent();
+            }
+        });
+
+        function searchStudent(code) {
+            fetch('@Url.Action("SearchStudentByCode", "Schedule")?studentCode=' + encodeURIComponent(code))
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showStudentInfo(data.student);
+                    } else {
+                        hideStudentInfo();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    hideStudentInfo();
+                });
+        }
+
+        function showStudentInfo(student) {
+            var infoDiv = document.getElementById('studentInfo');
+            if (!infoDiv) {
+                infoDiv = document.createElement('div');
+                infoDiv.id = 'studentInfo';
+                infoDiv.className = 'alert alert-info mt-2';
+                studentCodeInput.parentElement.parentElement.appendChild(infoDiv);
+            }
+            infoDiv.innerHTML = '<i class="fas fa-user"></i> <strong>' + student.name + '</strong> (' + student.code + ')';
+        }
+
+        function hideStudentInfo() {
+            var infoDiv = document.getElementById('studentInfo');
+            if (infoDiv) {
+                infoDiv.remove();
+            }
+        }
+
+        function addStudent() {
+            var code = studentCodeInput.value.trim();
+            if (!code) {
+                alert('Please enter a student code');
+                return;
+            }
+
+            // Check if already added
+            if (enrolledStudents.some(s => s.code.toLowerCase() === code.toLowerCase())) {
+                alert('This student is already added');
+                return;
+            }
+
+            // Search for student
+            fetch('@Url.Action("SearchStudentByCode", "Schedule")?studentCode=' + encodeURIComponent(code))
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        enrolledStudents.push(data.student);
+                        updateStudentList();
+                        studentCodeInput.value = '';
+                        hideStudentInfo();
+                    } else {
+                        alert('Student not found: ' + code);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error searching for student');
+                });
+        }
+
+        function removeStudent(code) {
+            enrolledStudents = enrolledStudents.filter(s => s.code !== code);
+            updateStudentList();
+        }
+
+        function updateStudentList() {
+            if (enrolledStudents.length === 0) {
+                studentList.innerHTML = '';
+                studentCodesInput.value = '';
+                return;
+            }
+
+            var html = '<div class="card"><div class="card-body"><h6 class="card-title">Enrolled Students (' + enrolledStudents.length + ')</h6><div class="d-flex flex-wrap gap-2">';
+            enrolledStudents.forEach(function(student, index) {
+                html += '<span class="badge bg-primary p-2 d-flex align-items-center gap-2" id="student-badge-' + index + '">' +
+                    '<span>' + student.name + ' (' + student.code + ')</span>' +
+                    '<button type="button" class="btn-close btn-close-white" data-code="' + student.code + '" aria-label="Remove"></button>' +
+                    '</span>';
+            });
+            html += '</div></div></div>';
+            studentList.innerHTML = html;
+
+            // Attach event listeners to remove buttons
+            studentList.querySelectorAll('.btn-close').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var code = this.getAttribute('data-code');
+                    removeStudent(code);
+                });
+            });
+
+            // Update hidden input
+            studentCodesInput.value = enrolledStudents.map(s => s.code).join(',');
+        }
     </script>
 }

@@ -44,6 +44,7 @@
                                 <th>Room</th>
                                 <th>Building</th>
                                 <th>Class Type</th>
+                                <th>Students</th>
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>
@@ -69,6 +70,15 @@
                                     <td>@(schedule.Room ?? "-")</td>
                                     <td>@(schedule.Building ?? "-")</td>
                                     <td>@(schedule.ClassType ?? "-")</td>
+                                    <td>
+                                        @{
+                                            var studentCounts = ViewBag.StudentCounts as Dictionary<int, int> ?? new Dictionary<int, int>();
+                                            var count = studentCounts.ContainsKey(schedule.CourseId) ? studentCounts[schedule.CourseId] : 0;
+                                        }
+                                        <span class="badge bg-info">
+                                            <i class="fas fa-users"></i> @count
+                                        </span>
+                                    </td>
                                     <td>
                                         <span class="badge @(schedule.Status == "Active" ? "bg-success" : "bg-secondary")">
                                             @schedule.Status

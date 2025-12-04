@@ -22,17 +22,29 @@ namespace AuthApp.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult Index()
         {
-            string? username = HttpContext.Session.GetString("Username");
-            if (username != null)
+            // Nếu user đã authenticated, redirect đến dashboard tương ứng
+            if (User?.Identity?.IsAuthenticated == true)
             {
+                if (User.IsInRole("Admin"))
+                {
+                    return RedirectToAction("Index", "AdminHome");
+                }
+                else if (User.IsInRole("Teacher"))
+                {
+                    return RedirectToAction("Index", "TeacherHome");
+                }
+                else if (User.IsInRole("Student"))
+                {
+                    return RedirectToAction("Index", "StudentHome");
+                }
                 return RedirectToAction("Index", "Home");
             }
-            else
-            {
-                return View();
-            }
+            
+            // Nếu chưa authenticated, hiển thị trang login
+            return View();
         }
 
         [HttpGet]

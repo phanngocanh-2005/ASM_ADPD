@@ -40,12 +40,65 @@ namespace AuthApp.Controllers
                     .ThenBy(s => s.StartTime)
                     .ToListAsync();
 
+                // Load số lượng sinh viên cho mỗi course
+                var courseIds = schedules.Select(s => s.CourseId).Distinct().ToList();
+                Dictionary<int, int> studentCounts = new Dictionary<int, int>();
+                
+                if (courseIds.Any())
+                {
+                    studentCounts = await _context.Enrollments
+                        .Where(e => courseIds.Contains(e.CourseId) && e.Status == "Enrolled")
+                        .GroupBy(e => e.CourseId)
+                        .Select(g => new { CourseId = g.Key, Count = g.Count() })
+                        .ToDictionaryAsync(x => x.CourseId, x => x.Count);
+                }
+
+                ViewBag.StudentCounts = studentCounts;
+
                 return View(schedules);
             }
             catch (Microsoft.Data.SqlClient.SqlException ex) when (ex.Message.Contains("Invalid object name 'Schedules'"))
             {
                 TempData["ErrorMessage"] = "The Schedules table does not exist in the database. Please run the database setup script: CreateSchedulesTable.sql";
                 return View(new List<Schedule>());
+            }
+            catch (Microsoft.Data.SqlClient.SqlException ex) when (ex.Message.Contains("Invalid column name 'StudentId'"))
+            {
+                // Try to automatically add the StudentId column
+                try
+                {
+                    await EnsureStudentIdColumnExists();
+                    // Retry the query after adding the column
+                    var schedules = await _context.Schedules
+                        .Include(s => s.Course)
+                        .Include(s => s.Teacher)
+                        .OrderBy(s => s.DayOfWeek)
+                        .ThenBy(s => s.StartTime)
+                        .ToListAsync();
+
+                    // Load số lượng sinh viên cho mỗi course
+                    var courseIds = schedules.Select(s => s.CourseId).Distinct().ToList();
+                    Dictionary<int, int> studentCounts = new Dictionary<int, int>();
+                    
+                    if (courseIds.Any())
+                    {
+                        studentCounts = await _context.Enrollments
+                            .Where(e => courseIds.Contains(e.CourseId) && e.Status == "Enrolled")
+                            .GroupBy(e => e.CourseId)
+                            .Select(g => new { CourseId = g.Key, Count = g.Count() })
+                            .ToDictionaryAsync(x => x.CourseId, x => x.Count);
+                    }
+
+                    ViewBag.StudentCounts = studentCounts;
+
+                    TempData["SuccessMessage"] = "Database schema updated successfully.";
+                    return View(schedules);
+                }
+                catch (Exception innerEx)
+                {
+                    TempData["ErrorMessage"] = $"Failed to add StudentId column. Please run the SQL script AddStudentIdToSchedules.sql manually. Error: {innerEx.Message}";
+                    return View(new List<Schedule>());
+                }
             }
             catch (Exception ex)
             {
@@ -98,6 +151,52 @@ namespace AuthApp.Controllers
                 _context.Schedules.Add(model);
                 await _context.SaveChangesAsync();
 
+                // Xử lý danh sách mã sinh viên từ form
+                var studentCodes = Request.Form["StudentCodes"].ToString();
+                if (!string.IsNullOrWhiteSpace(studentCodes))
+                {
+                    var codes = studentCodes.Split(new[] { ',', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
+                        .Select(c => c.Trim())
+                        .Where(c => !string.IsNullOrWhiteSpace(c))
+                        .Distinct()
+                        .ToList();
+
+                    int enrolledCount = 0;
+                    foreach (var code in codes)
+                    {
+                        var student = await _context.Students
+                            .FirstOrDefaultAsync(s => s.StudentCode == code && s.Status == "Active");
+
+                        if (student != null)
+                        {
+                            // Kiểm tra xem enrollment đã tồn tại chưa
+                            var existingEnrollment = await _context.Enrollments
+                                .FirstOrDefaultAsync(e => e.StudentId == student.Id && 
+                                                         e.CourseId == model.CourseId && 
+                                                         e.Status == "Enrolled");
+
+                            if (existingEnrollment == null)
+                            {
+                                var enrollment = new Enrollment
+                                {
+                                    StudentId = student.Id,
+                                    CourseId = model.CourseId,
+                                    EnrollmentDate = DateTime.UtcNow,
+                                    Status = "Enrolled",
+                                    CreatedAt = DateTime.UtcNow
+                                };
+                                _context.Enrollments.Add(enrollment);
+                                enrolledCount++;
+                            }
+                        }
+                    }
+
+                    if (enrolledCount > 0)
+                    {
+                        await _context.SaveChangesAsync();
+                    }
+                }
+
                 // Lấy tên giáo viên & kiểm tra xem giáo viên đã được gán môn chưa
                 var teacherName = await _context.Teachers
                     .Where(t => t.Id == model.TeacherId)
@@ -138,11 +237,30 @@ namespace AuthApp.Controllers
                 return NotFound();
             }
 
-            var schedule = await _context.Schedules.FindAsync(id);
+            var schedule = await _context.Schedules
+                .Include(s => s.Course)
+                .FirstOrDefaultAsync(s => s.Id == id);
+            
             if (schedule == null)
             {
                 return NotFound();
             }
+
+            // Load danh sách sinh viên đã enroll vào course này
+            var enrolledStudents = await _context.Enrollments
+                .Where(e => e.CourseId == schedule.CourseId && e.Status == "Enrolled")
+                .Include(e => e.Student)
+                .Select(e => new
+                {
+                    Id = e.Student.Id,
+                    Code = e.Student.StudentCode,
+                    Name = e.Student.FullName,
+                    EnrollmentId = e.Id
+                })
+                .OrderBy(s => s.Code)
+                .ToListAsync();
+
+            ViewBag.EnrolledStudents = enrolledStudents;
 
             await PopulateScheduleLookups(schedule.CourseId, schedule.TeacherId, schedule.StudentId);
 
@@ -191,6 +309,52 @@ namespace AuthApp.Controllers
 
             _context.Update(schedule);
             await _context.SaveChangesAsync();
+
+            // Xử lý danh sách mã sinh viên từ form
+            var studentCodes = Request.Form["StudentCodes"].ToString();
+            if (!string.IsNullOrWhiteSpace(studentCodes))
+            {
+                var codes = studentCodes.Split(new[] { ',', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(c => c.Trim())
+                    .Where(c => !string.IsNullOrWhiteSpace(c))
+                    .Distinct()
+                    .ToList();
+
+                int enrolledCount = 0;
+                foreach (var code in codes)
+                {
+                    var student = await _context.Students
+                        .FirstOrDefaultAsync(s => s.StudentCode == code && s.Status == "Active");
+
+                    if (student != null)
+                    {
+                        // Kiểm tra xem enrollment đã tồn tại chưa
+                        var existingEnrollment = await _context.Enrollments
+                            .FirstOrDefaultAsync(e => e.StudentId == student.Id && 
+                                                     e.CourseId == schedule.CourseId && 
+                                                     e.Status == "Enrolled");
+
+                        if (existingEnrollment == null)
+                        {
+                            var enrollment = new Enrollment
+                            {
+                                StudentId = student.Id,
+                                CourseId = schedule.CourseId,
+                                EnrollmentDate = DateTime.UtcNow,
+                                Status = "Enrolled",
+                                CreatedAt = DateTime.UtcNow
+                            };
+                            _context.Enrollments.Add(enrollment);
+                            enrolledCount++;
+                        }
+                    }
+                }
+
+                if (enrolledCount > 0)
+                {
+                    await _context.SaveChangesAsync();
+                }
+            }
 
             TempData["SuccessMessage"] = "Schedule updated successfully.";
             return RedirectToAction(nameof(Index));
@@ -320,6 +484,77 @@ namespace AuthApp.Controllers
         }
 
         // Time slots là gợi ý từ Singleton, không bắt buộc chính xác; chỉ cần EndTime > StartTime.
+
+        private async Task EnsureStudentIdColumnExists()
+        {
+            const string sql = @"
+IF COL_LENGTH('Schedules', 'StudentId') IS NULL
+BEGIN
+    ALTER TABLE Schedules
+    ADD StudentId INT NULL;
+
+    ALTER TABLE Schedules
+    ADD CONSTRAINT FK_Schedules_Students_StudentId
+        FOREIGN KEY (StudentId) REFERENCES Students(Id)
+        ON DELETE SET NULL;
+
+    CREATE INDEX IX_Schedules_StudentId
+        ON Schedules(StudentId);
+END";
+
+            await _context.Database.ExecuteSqlRawAsync(sql);
+        }
+
+        // API endpoint để tìm kiếm sinh viên theo mã
+        [HttpGet]
+        public async Task<IActionResult> SearchStudentByCode(string studentCode)
+        {
+            if (string.IsNullOrWhiteSpace(studentCode))
+            {
+                return Json(new { success = false, message = "Student code is required" });
+            }
+
+            var student = await _context.Students
+                .Where(s => s.StudentCode == studentCode.Trim() && s.Status == "Active")
+                .Select(s => new
+                {
+                    id = s.Id,
+                    code = s.StudentCode,
+                    name = s.FullName
+                })
+                .FirstOrDefaultAsync();
+
+            if (student == null)
+            {
+                return Json(new { success = false, message = "Student not found" });
+            }
+
+            return Json(new { success = true, student = student });
+        }
+
+        // Xóa sinh viên khỏi course (xóa enrollment)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemoveStudentFromCourse(int enrollmentId, int scheduleId)
+        {
+            try
+            {
+                var enrollment = await _context.Enrollments.FindAsync(enrollmentId);
+                if (enrollment == null)
+                {
+                    return Json(new { success = false, message = "Enrollment not found" });
+                }
+
+                _context.Enrollments.Remove(enrollment);
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true, message = "Student removed from course successfully" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Error: {ex.Message}" });
+            }
+        }
     }
 }
 
