@@ -1203,6 +1203,7 @@ E:\ASM_ADPD\AuthApp\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Runtime.Cach
 E:\ASM_ADPD\AuthApp\bin\Debug\net8.0\runtimes\browser\lib\net8.0\System.Text.Encodings.Web.dll
 E:\ASM_ADPD\AuthApp\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Windows.Extensions.dll
 E:\ASM_ADPD\AuthApp\obj\Debug\net8.0\AuthApp.csproj.AssemblyReference.cache
+E:\ASM_ADPD\AuthApp\obj\Debug\net8.0\rpswa.dswa.cache.json
 E:\ASM_ADPD\AuthApp\obj\Debug\net8.0\AuthApp.GeneratedMSBuildEditorConfig.editorconfig
 E:\ASM_ADPD\AuthApp\obj\Debug\net8.0\AuthApp.AssemblyInfoInputs.cache
 E:\ASM_ADPD\AuthApp\obj\Debug\net8.0\AuthApp.AssemblyInfo.cs
@@ -1211,10 +1212,14 @@ E:\ASM_ADPD\AuthApp\obj\Debug\net8.0\AuthApp.MvcApplicationPartsAssemblyInfo.cac
 E:\ASM_ADPD\AuthApp\obj\Debug\net8.0\AuthApp.RazorAssemblyInfo.cache
 E:\ASM_ADPD\AuthApp\obj\Debug\net8.0\AuthApp.RazorAssemblyInfo.cs
 E:\ASM_ADPD\AuthApp\obj\Debug\net8.0\AuthApp.sourcelink.json
+E:\ASM_ADPD\AuthApp\obj\Debug\net8.0\rjimswa.dswa.cache.json
+E:\ASM_ADPD\AuthApp\obj\Debug\net8.0\rjsmrazor.dswa.cache.json
+E:\ASM_ADPD\AuthApp\obj\Debug\net8.0\rjsmcshtml.dswa.cache.json
 E:\ASM_ADPD\AuthApp\obj\Debug\net8.0\scopedcss\Views\Shared\_Layout.cshtml.rz.scp.css
 E:\ASM_ADPD\AuthApp\obj\Debug\net8.0\scopedcss\bundle\AuthApp.styles.css
 E:\ASM_ADPD\AuthApp\obj\Debug\net8.0\scopedcss\projectbundle\AuthApp.bundle.scp.css
 E:\ASM_ADPD\AuthApp\obj\Debug\net8.0\staticwebassets.build.json
+E:\ASM_ADPD\AuthApp\obj\Debug\net8.0\staticwebassets.build.json.cache
 E:\ASM_ADPD\AuthApp\obj\Debug\net8.0\staticwebassets.development.json
 E:\ASM_ADPD\AuthApp\obj\Debug\net8.0\staticwebassets.build.endpoints.json
 E:\ASM_ADPD\AuthApp\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
@@ -1224,9 +1229,3 @@ E:\ASM_ADPD\AuthApp\obj\Debug\net8.0\refint\AuthApp.dll
 E:\ASM_ADPD\AuthApp\obj\Debug\net8.0\AuthApp.pdb
 E:\ASM_ADPD\AuthApp\obj\Debug\net8.0\AuthApp.genruntimeconfig.cache
 E:\ASM_ADPD\AuthApp\obj\Debug\net8.0\ref\AuthApp.dll
-E:\ASM_ADPD\AuthApp\obj\Debug\net8.0\staticwebassets\msbuild.AuthApp.Microsoft.AspNetCore.StaticWebAssets.props
-E:\ASM_ADPD\AuthApp\obj\Debug\net8.0\staticwebassets\msbuild.AuthApp.Microsoft.AspNetCore.StaticWebAssetEndpoints.props
-E:\ASM_ADPD\AuthApp\obj\Debug\net8.0\staticwebassets\msbuild.build.AuthApp.props
-E:\ASM_ADPD\AuthApp\obj\Debug\net8.0\staticwebassets\msbuild.buildMultiTargeting.AuthApp.props
-E:\ASM_ADPD\AuthApp\obj\Debug\net8.0\staticwebassets\msbuild.buildTransitive.AuthApp.props
-E:\ASM_ADPD\AuthApp\obj\Debug\net8.0\staticwebassets.pack.json

@@ -1,4 +1,3 @@
-
 @model AuthApp.Models.Student
 @{
     ViewData["Title"] = "Edit My Profile";
@@ -30,10 +29,11 @@
     <div class="row">
         <div class="col-md-8">
             <form asp-action="EditProfile" method="post">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="All" class="text-danger"></div>
+
                 <input type="hidden" asp-for="Id" />
                 <input type="hidden" asp-for="AccountId" />
-                <input type="hidden" asp-for="StudentCode" />
                 <input type="hidden" asp-for="AcademicProgramId" />
                 <input type="hidden" asp-for="EnrollmentDate" />
                 <input type="hidden" asp-for="Status" />
@@ -151,4 +151,3 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
-

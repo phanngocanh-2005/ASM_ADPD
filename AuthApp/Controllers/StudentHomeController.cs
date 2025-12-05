@@ -152,7 +152,7 @@ namespace AuthApp.Controllers
         public async Task<IActionResult> EditProfile()
         {
             var accountId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
-            
+
             var student = await _context.Students
                 .Include(s => s.Account)
                 .Include(s => s.AcademicProgram)
@@ -173,7 +173,7 @@ namespace AuthApp.Controllers
         public async Task<IActionResult> EditProfile(Student model)
         {
             var accountId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
-            
+
             var student = await _context.Students
                 .Include(s => s.Account)
                 .FirstOrDefaultAsync(s => s.AccountId == accountId);
@@ -192,6 +192,15 @@ namespace AuthApp.Controllers
             ModelState.Remove(nameof(Student.Status));
             ModelState.Remove(nameof(Student.GPA));
             ModelState.Remove(nameof(Student.CreatedAt));
+
+            // Remove nested Account validation errors (we only accept Account.Email from the form)
+            ModelState.Remove("Account.Username");
+            ModelState.Remove("Account.Role");
+            ModelState.Remove("Account.Password");
+            ModelState.Remove("Account.Fullname");
+            ModelState.Remove("Account.Id");
+            // Also remove Account.Email so controller can validate/update it manually without ModelState blocking
+            ModelState.Remove("Account.Email");
 
             if (!ModelState.IsValid)
             {
@@ -242,7 +251,7 @@ namespace AuthApp.Controllers
         public async Task<IActionResult> DeleteProfile()
         {
             var accountId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
-            
+
             var student = await _context.Students
                 .Include(s => s.Account)
                 .Include(s => s.AcademicProgram)
@@ -262,7 +271,7 @@ namespace AuthApp.Controllers
         public async Task<IActionResult> DeleteProfileConfirmed()
         {
             var accountId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
-            
+
             var student = await _context.Students
                 .FirstOrDefaultAsync(s => s.AccountId == accountId);
 
